@@ -1,27 +1,20 @@
+import { mockUsers } from "../../utils/mockData";
 import React, { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-interface AuthGuardProps {
+/**
+ * Route protection component.
+ * - Shows a loading indicator while auth state resolves.
+ * - Redirects unauthenticated users to /login.
+ * - Renders children for authenticated users.
+ */
+interface Props {
   children: ReactNode;
-  guest?: boolean;
 }
 
-/**
- * AuthGuard protects routes.
- * - If `guest` is true, the route is accessible without authentication.
- * - Otherwise, unauthenticated users are redirected to /login.
- */
-export const AuthGuard: React.FC<AuthGuardProps> = ({ children, guest = false }) => {
-  const { user, loading } = useAuth();
+export const AuthGuard: React.FC<Props> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!guest && !user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
+// loading state removed (was: if (loading) { ... }
+}

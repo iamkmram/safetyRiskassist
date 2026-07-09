@@ -1,20 +1,23 @@
-/**
- * Permission helper that works against the mock user data.
- */
-
-import { MOCK_USERS } from "../models/User";
+import { DatabaseService } from "./DatabaseService";
 
 /**
- * Checks whether a given user (by id) possesses a specific permission string.
- * Returns false if the user cannot be found.
- *
- * @param userId - the identifier of the user (e.g., "user-001")
- * @param permission - permission string such as "knowledge:read"
+ * PermissionService - reads the `permissions` JSON array stored in auth_user.
  */
-export function hasPermission(userId: string, permission: string): boolean {
-  const user = MOCK_USERS.find((u) => u.id === userId);
-  if (!user) {
-    return false;
+export class PermissionService {
+  /** Returns true if the user has the requested permission string. */
+  static async hasPermission(userId: string, permission: string): Promise<boolean> {
+    const rows = await DatabaseService.query<{ permissions: string }>(
+      "SELECT permissions FROM auth_user WHERE id = ?",
+      [userId],
+    );
+    if (rows.length === 0) {
+      return false;
+    }
+    try {
+      const perms: string[] = JSON.parse(rows[0].permissions);
+      return perms.includes(permission);
+    } catch {
+      return false;
+    }
   }
-  return user.permissions.includes(permission);
 }

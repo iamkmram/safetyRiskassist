@@ -1,6 +1,2 @@
-"""
-documents package - placeholder for Azure Function document endpoints.
-
-This module currently contains no operational code; it exists to satisfy
-Python import requirements and to provide a short description of its purpose.
-"""
+# This file marks the documents function package as a Python module.
+# No Python code is required for the current TypeScriptbased Azure Functions.

@@ -1,28 +1,47 @@
--- Initial schema for Dertour Travel Knowledge Assistant
--- Users table
-CREATE TABLE IF NOT EXISTS users (
+-- 001_initial_schema.sql
+-- Create the auth_user table and insert three mock users.
+-- SQLite dialect is used; JSON stored as TEXT.
+
+PRAGMA foreign_keys=ON;
+PRAGMA journal_mode=WAL;
+
+CREATE TABLE IF NOT EXISTS auth_user (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     department TEXT,
     role TEXT,
     avatar TEXT,
-    last_login TEXT,            -- ISO8601 timestamp stored as TEXT
-    permissions TEXT            -- JSON array stored as TEXT
+    last_login TEXT,
+    permissions TEXT   -- JSON array stored as TEXT
 );
 
--- Permissions table (reference list)
-CREATE TABLE IF NOT EXISTS permissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
-);
+INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
+('user-001',
+ 'Sarah Chen',
+ 'sarah.chen@dertour.com',
+ 'Risk Assessment',
+ 'Travel Advisor',
+ '/avatars/sarah.jpg',
+ '2026-07-08T14:30:00Z',
+ '["knowledge:read","documents:view"]');
 
--- Sessions table (simple token store)
-CREATE TABLE IF NOT EXISTS sessions (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL,
-    expires_at TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
+('user-002',
+ 'Marcus Weber',
+ 'marcus.weber@dertour.com',
+ 'Operations',
+ 'Senior Manager',
+ '/avatars/marcus.jpg',
+ '2026-07-07T09:15:00Z',
+ '["knowledge:read","documents:view","admin:access"]');
+
+INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
+('user-003',
+ 'Emma Schneider',
+ 'emma.schneider@dertour.com',
+ 'Customer Service',
+ 'Travel Specialist',
+ '/avatars/emma.jpg',
+ '2026-07-06T11:45:00Z',
+ '["knowledge:read"]');
