@@ -1,20 +1,5 @@
-/**
- * Mock user definitions for frontend and backend simulation.
- * All timestamps are ISO8601 strings in UTC.
- */
+import { AuthUser } from "../types/auth.types";
 
-export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  department: string;
-  role: string;
-  avatar: string;
-  lastLogin: string;
-  permissions: string[];
-}
-
-/** Mock user data */
 export const MOCK_USERS: AuthUser[] = [
   {
     id: "user-001",
@@ -24,7 +9,7 @@ export const MOCK_USERS: AuthUser[] = [
     role: "Travel Advisor",
     avatar: "/avatars/sarah.jpg",
     lastLogin: "2026-07-08T14:30:00Z",
-    permissions: ["knowledge:read", "documents:view"]
+    permissions: ["knowledge:read", "documents:view"],
   },
   {
     id: "user-002",
@@ -33,8 +18,8 @@ export const MOCK_USERS: AuthUser[] = [
     department: "Operations",
     role: "Senior Manager",
     avatar: "/avatars/marcus.jpg",
-    lastLogin: "2026-07-07T09:15:00Z",
-    permissions: ["knowledge:read", "documents:view", "admin:panel"]
+    lastLogin: "2026-07-07T10:20:00Z",
+    permissions: [],
   },
   {
     id: "user-003",
@@ -43,7 +28,7 @@ export const MOCK_USERS: AuthUser[] = [
     department: "Customer Service",
     role: "Travel Specialist",
     avatar: "/avatars/emma.jpg",
-    lastLogin: "2026-07-06T16:45:00Z",
-    permissions: ["knowledge:read"]
-  }
+    lastLogin: "2026-07-06T08:15:00Z",
+    permissions: [],
+  },
 ];
