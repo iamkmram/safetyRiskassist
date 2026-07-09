@@ -1,10 +1,11 @@
-/**
- * Knowledge item model - used for search results.
- */
 export interface KnowledgeItem {
-  id: string;
+  article_id: string;          // UUID
   title: string;
-  excerpt: string;
+  content: string;
   category: string;
-  updated_at: string; // ISO8601
+  created_at: string;          // ISO8601
+  updated_at: string;          // ISO8601
+  is_popular: boolean;
+  is_published: boolean;
+  view_count: number;
 }

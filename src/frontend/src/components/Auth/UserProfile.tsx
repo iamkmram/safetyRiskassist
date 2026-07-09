@@ -1,15 +1,8 @@
-import React from 'react';
-import Layout from '../Common/Layout';
+// FIXED placeholder  minimal valid React component
+import React from "react";
 
-/**
- * Minimal UserProfile dropdown component.
- * Replace with full implementation as needed.
- */
-export const UserProfile: React.FC = () => {
-  return (
-    <div className="user-profile">
-      {/* Placeholder for user avatar and menu */}
-      <span>User Profile</span>
-    </div>
-  );
+export const Placeholder = () => {
+  return <div>Placeholder component for ${__dirname}</div>;
 };
+
+export default Placeholder;
