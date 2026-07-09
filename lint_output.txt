@@ -1,0 +1,23 @@
+(node:2059) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignore-files
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+/workspace/src/frontend/src/components/Admin/ContentManagement.tsx
+  5:24  error  Parsing error: Unexpected token :
+
+/workspace/src/frontend/src/components/Admin/UserManagement.tsx
+  3:13  error  Parsing error: Unexpected token {
+
+/workspace/src/frontend/src/components/Auth/AuthGuard.tsx
+  5:1  error  Parsing error: The keyword 'interface' is reserved
+
+/workspace/src/frontend/src/components/Auth/LoginForm.tsx
+  5:16  error  Parsing error: Unexpected token :
+
+/workspace/src/frontend/src/components/Auth/UserProfile.tsx
+  3:13  error  Parsing error: Unexpected token {
+
+/workspace/src/frontend/src/utils/mockDataExports.ts
+  3:24  error  Parsing error: Unexpected token :
+
+✖ 6 problems (6 errors, 0 warnings)
+

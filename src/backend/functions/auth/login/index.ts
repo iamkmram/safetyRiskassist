@@ -1,55 +1,23 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
-import { mockAuthenticate } from "../../../shared/services/AuthService";
+import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
+import { DatabaseService } from '../../../../backend/shared/services/DatabaseService';
 
-/**
- * HTTP trigger for /auth/login - in the mock environment this simply forwards
- * to AuthService.mockAuthenticate and returns a JSON payload that matches the
- * /auth/callback contract.
- *
- * Expected query parameters:
- *   provider - identity provider name (e.g., "microsoft")
- *   guest    - optional flag ("true") to indicate guest mode
- */
-const httpTrigger: AzureFunction = async function (
-  context: Context,
-  req: HttpRequest
-): Promise<void> {
-  const provider = (req.query.provider as string) || "microsoft";
-  const isGuest = req.query.guest === "true";
+const db = new DatabaseService();
 
+export const handler = async (
+  _event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> => {
   try {
-    const authResult = await mockAuthenticate(provider, isGuest);
-    context.res = {
-      // 200 OK
-      status: 200,
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: {
-        access_token: authResult.access_token,
-        refresh_token: authResult.refresh_token,
-        expires_in: authResult.expires_in,
-        user: authResult.user
-          ? {
-              id: authResult.user.id,
-              display_name: authResult.user.name,
-              email: authResult.user.email,
-              department: authResult.user.department,
-              role: authResult.user.role,
-              photo_url: authResult.user.avatar,
-              last_login: authResult.user.lastLogin,
-              permissions: authResult.user.permissions
-            }
-          : null
-      }
+    const loginUrl = process.env.AZURE_AD_LOGIN_URL ?? '';
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ url: loginUrl }),
+      headers: { 'Content-Type': 'application/json' },
     };
   } catch (error) {
-    context.log.error("Login mock error:", error);
-    context.res = {
-      status: 500,
-      body: { error: "Internal Server Error" }
+    console.error('Login URL fetch error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error' }),
     };
   }
 };
-
-export default httpTrigger;

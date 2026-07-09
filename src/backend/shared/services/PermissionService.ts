@@ -1,20 +1,26 @@
-/**
- * Permission helper that works against the mock user data.
- */
+import { DatabaseService } from './DatabaseService';
+import type { Permission } from '../types/database.types';
 
-import { MOCK_USERS } from "../models/User";
+export class PermissionService {
+  private db: DatabaseService;
 
-/**
- * Checks whether a given user (by id) possesses a specific permission string.
- * Returns false if the user cannot be found.
- *
- * @param userId - the identifier of the user (e.g., "user-001")
- * @param permission - permission string such as "knowledge:read"
- */
-export function hasPermission(userId: string, permission: string): boolean {
-  const user = MOCK_USERS.find((u) => u.id === userId);
-  if (!user) {
-    return false;
+  constructor() {
+    this.db = new DatabaseService();
   }
-  return user.permissions.includes(permission);
+
+  async canReadHelp(role: string): Promise<boolean> {
+    const res = await this.db['pool'].query(
+      'SELECT can_read FROM permissions WHERE role = $1 AND resource = $2',
+      [role, 'help']
+    );
+    return res.rowCount ? res.rows[0].can_read : false;
+  }
+
+  async canWriteHelp(role: string): Promise<boolean> {
+    const res = await this.db['pool'].query(
+      'SELECT can_write FROM permissions WHERE role = $1 AND resource = $2',
+      [role, 'help']
+    );
+    return res.rowCount ? res.rows[0].can_write : false;
+  }
 }

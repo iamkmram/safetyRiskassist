@@ -1,0 +1,21 @@
+(node:2131) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignore-files
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+Oops! Something went wrong! :(
+
+ESLint: 10.6.0
+
+You are linting "/workspace/src/frontend/src/**/*.{ts,tsx,js,jsx}", but all of the files matching the glob pattern "/workspace/src/frontend/src/**/*.{ts,tsx,js,jsx}" are ignored.
+
+If you don't want to lint these files, remove the pattern "/workspace/src/frontend/src/**/*.{ts,tsx,js,jsx}" from the list of arguments passed to ESLint.
+
+If you do want to lint these files, explicitly list one or more of the files from this glob that you'd like to lint to see more details about why they are ignored.
+
+  * If the file is ignored because of a matching ignore pattern, check global ignores in your config file.
+    https://eslint.org/docs/latest/use/configure/ignore
+
+  * If the file is ignored because no matching configuration was supplied, check file patterns in your config file.
+    https://eslint.org/docs/latest/use/configure/configuration-files#specify-files-with-arbitrary-extensions
+
+  * If the file is ignored because it is located outside of the base path, change the location of your config file to be in a parent directory.
+
