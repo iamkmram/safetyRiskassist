@@ -1,10 +1,7 @@
-import { mockAuthenticate } from "../../utils/mockDataExports";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Layout from '../Common/Layout';
-import { mockUsers } from '../../utils/mockData';
-// import { mockAuthenticate, getMockLoginUrl } from "../../../backend/shared/services/AuthService";
-// import { AuthUser } from "../../../backend/shared/models/User";
+import { mockAuthenticate, getMockLoginUrl } from "../../../backend/shared/services/AuthService";
+import { AuthUser } from "../../../backend/shared/models/User";
 
 /**
  * LoginForm - mock login screen with Dertour branding.
