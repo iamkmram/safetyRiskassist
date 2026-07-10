@@ -1,3 +1,8 @@
+from backend.shared.middleware.audit.middleware import AuditMiddleware
+from backend.shared.middleware.validation.middleware import ValidationMiddleware
+from backend.shared.middleware.rate_limit.middleware import RateLimitMiddleware
+from backend.shared.middleware.error_handler.middleware import ErrorHandlerMiddleware
+from backend.shared.middleware.cors.middleware import CorsMiddleware
 """
 FastAPI application entry point.
 Configures middleware stack, registers routers, and sets OpenAPI metadata.
