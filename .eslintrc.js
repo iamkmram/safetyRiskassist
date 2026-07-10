@@ -1,4 +1,5 @@
 module.exports = {
+  ignores: [],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
