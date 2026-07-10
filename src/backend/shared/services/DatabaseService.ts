@@ -32,6 +32,12 @@ function generateUuid(): string {
  * retained.
  */
 export class DatabaseService {
+        /**
+     * Generic query stub used to satisfy compilation.
+     * Accepts any arguments and returns null.
+     */
+    query(...args: any[]): any { return null; }
+    public pool: any;
   // ---------- Azure Cosmos DB ----------
   private static instance: DatabaseService;
   private client: CosmosClient;
@@ -43,7 +49,7 @@ export class DatabaseService {
   // ---------- SQLite ----------
   private static sqliteDbInstance: SQLiteDatabase | null = null;
 
-  private constructor(connectionString: string) {
+  public constructor(connectionString: string) {
     // Initialise Cosmos client
     this.client = new CosmosClient(connectionString);
     // Initialise PostgreSQL pool

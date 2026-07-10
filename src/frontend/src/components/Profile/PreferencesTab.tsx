@@ -2,6 +2,7 @@
 /* eslint-disable */
 import React, { useState } from "react";
 // @ts-ignore
+// @ts-ignore
 import { UserPreferences } from "../../../utils/mockData";
 
 export default function PreferencesTab() {

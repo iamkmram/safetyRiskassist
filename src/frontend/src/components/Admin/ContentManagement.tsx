@@ -6,7 +6,7 @@
 import React from "react";
 
 export const Placeholder = () => {
-//  return <div>Placeholder component for ${.}</div>;
+  // return <div>Placeholder component for ${.}</div>;
 };
 
 export const ContentManagement: React.FC = () => {
