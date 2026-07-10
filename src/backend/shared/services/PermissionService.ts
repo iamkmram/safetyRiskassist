@@ -1,68 +1,29 @@
-import { DatabaseService } from "./DatabaseService";
-import type { Permission } from "../types/database.types";
+import { getConnection } from "typeorm";
+import { UserRole } from "../models/UserRole";
 
 /**
- * Permission helper that works against the mock user data.
- *
- * @param userId - the identifier of the user (e.g., "user-001")
- * @param permission - permission string such as "knowledge:read"
- */
-export function hasPermission(userId: string, permission: string): boolean {
-  const user = MOCK_USERS.find((u) => u.id === userId);
-  if (!user) {
-    return false;
-  }
-  return user.permissions.includes(permission);
-}
-
-/**
- * PermissionService - provides various permission checks against the database.
+ * PermissionService - tiny helper around role checking.
+ * In a production app you would have a full ACL system.
  */
 export class PermissionService {
-  private db: DatabaseService;
-
-  constructor() {
-    this.db = new DatabaseService();
+  /** Does the given user have a specific permission? */
+  static async has_permission(user_id: string, permission: string): Promise<boolean> {
+    const repo = getConnection().getRepository(UserRole);
+    const role = await repo.findOne({ where: { userId: user_id } });
+    if (!role) return false;
+    // Simple mapping - extend as needed
+    const rolePermissions: Record<string, string[]> = {
+      admin: ["admin_settings", "view_all"],
+      user: ["view_own"],
+    };
+    const perms = rolePermissions[role.role] || [];
+    return perms.includes(permission);
   }
 
-  /**
-   * Checks if a role can read the "help" resource.
-   */
-  async canReadHelp(role: string): Promise<boolean> {
-    const res = await this.db["pool"].query(
-      "SELECT can_read FROM permissions WHERE role = $1 AND resource = $2",
-      [role, "help"]
-    );
-    return res.rowCount ? res.rows[0].can_read : false;
-  }
-
-  /**
-   * Checks if a role can write to the "help" resource.
-   */
-  async canWriteHelp(role: string): Promise<boolean> {
-    const res = await this.db["pool"].query(
-      "SELECT can_write FROM permissions WHERE role = $1 AND resource = $2",
-      [role, "help"]
-    );
-    return res.rowCount ? res.rows[0].can_write : false;
-  }
-
-  /**
-   * Returns true if the user has the requested permission string.
-   */
-  static async hasPermission(userId: string, permission: string): Promise<boolean> {
-    const rows = await DatabaseService.query<{ permissions: string }>(
-      "SELECT permissions FROM auth_user WHERE id = ?",
-      [userId]
-    );
-    if (rows.length === 0) {
-      return false;
-    }
-    try {
-      const perms: string[] = JSON.parse(rows[0].permissions);
-      return perms.includes(permission);
-    } catch {
-      return false;
-    }
+  /** Helper used by the frontend to quickly know if a user is admin */
+  static async is_admin(user_id: string): Promise<boolean> {
+    const repo = getConnection().getRepository(UserRole);
+    const role = await repo.findOne({ where: { userId: user_id } });
+    return role?.role === "admin";
   }
 }

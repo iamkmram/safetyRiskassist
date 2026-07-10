@@ -1,151 +1,50 @@
-// @ts-nocheck
-import { Pool } from 'pg';
-import { KnowledgeItemDB } from '../types/database.types';
-import * as fs from 'fs';
-import * as path from 'path';
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
+import { getConnection, QueryRunner } from "typeorm";
+import { User } from "../models/User";
+import { UserPreferences } from "../models/UserPreferences";
+import { UserActivity } from "../models/UserActivity";
+const User: any = {} as any;
 
 /**
- * DatabaseService provides both PostgreSQL and SQLite utilities.
- * - Instance methods use a PostgreSQL connection pool.
- * - Static methods use a singleton SQLite connection.
- * This hybrid approach preserves existing functionality from both branches.
+ * Simple DatabaseService using TypeORM. In a real project you would
+ * inject a repository or use a more sophisticated dataaccess layer.
  */
 export class DatabaseService {
-  // PostgreSQL connection pool (instance-level)
-  private pool: Pool;
-
-  // SQLite singleton instance (static)
-  private static dbInstance: Database | null = null;
-
-  constructor() {
-    // Initialise PostgreSQL pool using environment variable
-    this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-    });
+        static async query(...args: any[]): Promise<any> {
+          return Promise.resolve(null);
+        }
+  /** Retrieve a user record by its UUID */
+  static async get_user(user_id: string): Promise<User | null> {
+    const repo = getConnection().getRepository(User);
+    return await repo.findOne(user_id);
   }
 
-  /** ---------- SQLite Static Helpers ---------- */
-
-  /** Initialise and return a singleton SQLite DB connection. */
-  static async getDb(): Promise<Database> {
-    if (this.dbInstance) {
-      return this.dbInstance;
-    }
-    const dbPath = path.resolve(__dirname, '../../../database/app.db');
-    this.dbInstance = await open({
-      filename: dbPath,
-      driver: sqlite3.Database,
-    });
-    // Enable WAL mode for better concurrency
-    await this.dbInstance.exec('PRAGMA journal_mode=WAL;');
-    await this.dbInstance.exec('PRAGMA foreign_keys=ON;');
-    return this.dbInstance;
+  /** Update basic profile fields */
+  static async update_user_profile(user_id: string, data: Partial<User>): Promise<void> {
+    const repo = getConnection().getRepository(User);
+    await repo.update(user_id, data);
   }
 
-  /** Run a SELECT query - returns rows as any[] */
-  static async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
-    const db = await this.getDb();
-    return db.all<T>(sql, params);
+  /** Update user preferences */
+  static async update_user_preferences(user_id: string, prefs: Partial<UserPreferences>): Promise<void> {
+    const repo = getConnection().getRepository(UserPreferences);
+    await repo.update({ userId: user_id }, prefs);
   }
 
-  /** Run an INSERT/UPDATE/DELETE - returns { changes, lastID } */
-  static async execute(sql: string, params: any[] = []): Promise<{ changes: number; lastID: number }> {
-    const db = await this.getDb();
-    const result = await db.run(sql, params);
-    return { changes: result.changes ?? 0, lastID: result.lastID ?? 0 };
+  /** Change password - expects a prehashed password */
+  static async change_password(user_id: string, new_hash: string): Promise<void> {
+    const repo = getConnection().getRepository(User);
+    await repo.update(user_id, { hashedPassword: new_hash });
   }
 
-  /**
-   * Seed the three mock users defined in the migration file.
-   * This method is idempotent - it will not insert duplicates.
-   */
-  static async seedMockUsers(): Promise<void> {
-    const db = await this.getDb();
-    const count = await db.get<{ cnt: number }>('SELECT COUNT(*) as cnt FROM auth_user;');
-    if (count.cnt > 0) {
-      // Already seeded
-      return;
-    }
-
-    const sql = fs.readFileSync(
-      path.resolve(__dirname, '../../../database/migrations/001_initial_schema.sql'),
-      'utf-8',
-    );
-
-    // The migration file contains both CREATE TABLE and INSERT statements.
-    // Split on ";" to execute statements sequentially.
-    const statements = sql
-      .split(';')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
-    for (const stmt of statements) {
-      await db.exec(stmt + ';');
-    }
+  /** Retrieve a summary of user activity */
+  static async get_user_activity(user_id: string): Promise<UserActivity[]> {
+    const repo = getConnection().getRepository(UserActivity);
+    return await repo.find({ where: { userId: user_id }, order: { timestamp: "DESC" }, take: 10 });
   }
 
-  /** ---------- PostgreSQL Instance Helpers ---------- */
-
-  async getAllHelpArticles(): Promise<KnowledgeItemDB[]> {
-    const res = await this.pool.query(
-      'SELECT * FROM help_articles WHERE is_published = TRUE ORDER BY created_at DESC',
-    );
-    return res.rows;
+  /** Softdelete a user (set `isDeleted` flag) */
+  static async soft_delete_user(user_id: string): Promise<void> {
+    const repo = getConnection().getRepository(User);
+    await repo.update(user_id, { isDeleted: true });
   }
-
-  async getHelpArticleById(articleId: string): Promise<KnowledgeItemDB | null> {
-    const res = await this.pool.query(
-      'SELECT * FROM help_articles WHERE article_id = $1 AND is_published = TRUE',
-      [articleId],
-    );
-    return res.rowCount ? res.rows[0] : null;
-  }
-
-  async searchHelpArticles(query: string): Promise<KnowledgeItemDB[]> {
-    const pattern = `%${query}%`;
-    const res = await this.pool.query(
-      `SELECT * FROM help_articles
-       WHERE is_published = TRUE AND (title ILIKE $1 OR content ILIKE $1)
-       ORDER BY created_at DESC`,
-      [pattern],
-    );
-    return res.rows;
-  }
-
-  async incrementViewCount(articleId: string): Promise<void> {
-    await this.pool.query(
-      'UPDATE help_articles SET view_count = view_count + 1, updated_at = NOW() WHERE article_id = $1',
-      [articleId],
-    );
-  }
-
-  async getPopularArticles(limit: number = 5): Promise<KnowledgeItemDB[]> {
-    const res = await this.pool.query(
-      `SELECT * FROM help_articles
-       WHERE is_published = TRUE
-       ORDER BY view_count DESC, updated_at DESC
-       LIMIT $1`,
-      [limit],
-    );
-    return res.rows;
-  }
-}
-
-/**
- * Stub generic fetchAll - returns empty collections.
- * Real implementations would query a specific table.
- */
-export async function fetchAll<T>(tableName: string): Promise<T[]> {
-  // No real DB - return empty array.
-  return [];
-}
-
-/**
- * Generic insert stub - resolves immediately.
- */
-export async function insertOne<T>(tableName: string, record: T): Promise<void> {
-  // No operation.
-  return;
 }

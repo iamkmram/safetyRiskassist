@@ -1,20 +1,27 @@
-export type KnowledgeItemDB = {
-  article_id: string;
-  title: string;
-  content: string;
-  category: string;
-  created_at: Date;
-  updated_at: Date;
-  is_popular: boolean;
-  is_published: boolean;
-  view_count: number;
-};
-
-export type Permission = {
-  permission_id: string;
+export interface UserDetail {
+  id: string;
+  name: string;
+  email: string;
+  department: string;
   role: string;
-  resource: string;
-  can_read: boolean;
-  can_write: boolean;
-  created_at: Date;
-};
+  profile_photo_url?: string;
+  preferences: UserPreferences;
+  security: UserSecurity;
+}
+
+export interface UserPreferences {
+  ui_theme: "light" | "dark";
+  notifications_enabled: boolean;
+  language: "en" | "es" | "fr" | "de" | "zh";
+}
+
+export interface UserSecurity {
+  mfa_enabled: boolean;
+  last_password_change: string; // ISO datetime
+}
+
+export interface ActivitySummary {
+  recent_conversations: number;
+  documents_viewed: number;
+  last_login: string;
+}
