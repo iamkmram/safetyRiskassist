@@ -1,6 +1,15 @@
-"""Conversation endpoints for the chat API."""
+def get_conversation(request):
+    """Retrieve a conversation."""
+    pass
 
-def main(req):
-    # TODO: implement conversation creation / listing
-    return {"status": "OK"}
+def post_conversation(request):
+    """Create a new conversation."""
+    pass
 
+def put_conversation(request):
+    """Update a conversation."""
+    pass
+
+def delete_conversation(request):
+    """Delete a conversation."""
+    pass

@@ -1,6 +1,7 @@
-"""Message endpoints for the chat API."""
+def get_message(request):
+    """Retrieve a message."""
+    pass
 
-def main(req):
-    # TODO: implement message sending / retrieval
-    return {"status": "OK"}
-
+def post_message(request):
+    """Create a new message."""
+    pass
