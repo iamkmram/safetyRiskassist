@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { DefaultAzureCredential } from '@azure/identity';
 import { SecretClient } from '@azure/keyvault-secrets';
+import jwt from 'jsonwebtoken';
 import { DatabaseService } from "./DatabaseService";
 import { User } from "../models/User";
 
@@ -26,6 +27,17 @@ export interface JwtPayload {
   name?: string;
   roles?: string[];
   [key: string]: any;
+}
+
+/**
+ * Payload for generic JWT verification (e.g., using app secret).
+ */
+export interface UserPayload {
+  sub: string;          // user identifier (GUID)
+  name?: string;
+  email?: string;
+  roles?: string[];      // optional list of role IDs
+  // any other claims you need
 }
 
 /**
@@ -237,5 +249,23 @@ export class AuthService {
     const user = rows[0];
     user.permissions = JSON.parse((user as any).permissions);
     return user;
+  }
+
+  // --- Static JWT verification using app secret (from integration) ---
+
+  /**
+   * Verifies a JWT signed with the application's secret.
+   * In production you would verify against Azure AD public keys.
+   */
+  static async verifyJwt(token: string): Promise<UserPayload> {
+    return new Promise<UserPayload>((resolve, reject) => {
+      jwt.verify(token, process.env.JWT_SECRET || 'dev-secret', (err, decoded) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(decoded as UserPayload);
+        }
+      });
+    });
   }
 }

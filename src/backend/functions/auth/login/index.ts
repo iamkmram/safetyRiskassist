@@ -297,4 +297,117 @@ export const login: AzureFunction = async (context: Context, req: HttpRequest): 
   };
 };
 
+/**
+ * Legacy HTTP trigger from prior integration (username/password flow).
+ */
+export const httpTriggerLegacy: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    context.res = {
+      status: 400,
+      body: { error: 'Missing username or password' },
+    };
+    return;
+  }
+
+  // Stub validation – replace with real DB check.
+  const user = await new DatabaseService().query<any>(
+    `SELECT * FROM users WHERE username = $1`,
+    [username],
+  );
+
+  if (!user.length) {
+    context.res = {
+      status: 401,
+      body: { error: 'Invalid credentials' },
+    };
+    return;
+  }
+
+  const payload = {
+    sub: user[0].id,
+    name: user[0].username,
+    email: user[0].email,
+  };
+
+  const secret = process.env.JWT_SECRET || 'dev-secret';
+  const token = jwt.sign(payload, secret, { expiresIn: '1h' });
+
+  context.res = {
+    status: 200,
+    body: {
+      access_token: token,
+      expires_in: 3600,
+    },
+  };
+};
+
+/**
+ * Legacy AWS Lambda handler for login URL (from base version).
+ */
+export const loginUrlLegacyHandler = async (
+  _event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> => {
+  try {
+    const loginUrl = process.env.AZURE_AD_LOGIN_URL ?? '';
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: loginUrl }),
+    };
+  } catch (error) {
+    console.error('Login URL fetch error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal server error' }),
+    };
+  }
+};
+
+/**
+ * Legacy login implementation from base version (uses getUserByUsername directly).
+ */
+export const loginLegacy: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+  const { username, password } = req.body || {};
+
+  if (!username || !password) {
+    context.res = {
+      status: 400,
+      body: { error: 'Missing username or password' },
+    };
+    return;
+  }
+
+  const user = await getUserByUsername(username);
+  if (!user || user.passwordHash !== password) {
+    context.res = { status: 401, body: { error: 'Invalid credentials' } };
+    return;
+  }
+
+  const tokenPayload = {
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+
+  const accessToken = jwt.sign(tokenPayload, process.env.AUTH_JWT_SECRET!, {
+    expiresIn: '1h',
+  });
+
+  const refreshToken = jwt.sign({ sub: user.id }, process.env.AUTH_REFRESH_SECRET!, {
+    expiresIn: '7d',
+  });
+
+  context.res = {
+    status: 200,
+    body: {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 3600,
+    },
+  };
+};
+
 export default loginPassword;
