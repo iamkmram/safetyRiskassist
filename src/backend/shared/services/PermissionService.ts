@@ -1,68 +1,48 @@
-import { DatabaseService } from "./DatabaseService";
-import type { Permission } from "../types/database.types";
+import { DatabaseService } from './DatabaseService';
+import { Permission } from '../types/database.types';
+import { logger } from '../../utils/logger';
 
 /**
- * Permission helper that works against the mock user data.
- *
- * @param userId - the identifier of the user (e.g., "user-001")
- * @param permission - permission string such as "knowledge:read"
- */
-export function hasPermission(userId: string, permission: string): boolean {
-  const user = MOCK_USERS.find((u) => u.id === userId);
-  if (!user) {
-    return false;
-  }
-  return user.permissions.includes(permission);
-}
-
-/**
- * PermissionService - provides various permission checks against the database.
+ * Service responsible for permission checks.
+ * Uses the 'permissions' container.
  */
 export class PermissionService {
-  private db: DatabaseService;
+  private static readonly CONTAINER = 'permissions';
+  private dbService: DatabaseService;
 
-  constructor() {
-    this.db = new DatabaseService();
+  constructor(dbService: DatabaseService) {
+    this.dbService = dbService;
   }
 
-  /**
-   * Checks if a role can read the "help" resource.
-   */
-  async canReadHelp(role: string): Promise<boolean> {
-    const res = await this.db["pool"].query(
-      "SELECT can_read FROM permissions WHERE role = $1 AND resource = $2",
-      [role, "help"]
-    );
-    return res.rowCount ? res.rows[0].can_read : false;
-  }
-
-  /**
-   * Checks if a role can write to the "help" resource.
-   */
-  async canWriteHelp(role: string): Promise<boolean> {
-    const res = await this.db["pool"].query(
-      "SELECT can_write FROM permissions WHERE role = $1 AND resource = $2",
-      [role, "help"]
-    );
-    return res.rowCount ? res.rows[0].can_write : false;
-  }
-
-  /**
-   * Returns true if the user has the requested permission string.
-   */
-  static async hasPermission(userId: string, permission: string): Promise<boolean> {
-    const rows = await DatabaseService.query<{ permissions: string }>(
-      "SELECT permissions FROM auth_user WHERE id = ?",
-      [userId]
-    );
-    if (rows.length === 0) {
-      return false;
-    }
+  /** Check if a user has a given role */
+  public async hasRole(userId: string, role: string): Promise<boolean> {
     try {
-      const perms: string[] = JSON.parse(rows[0].permissions);
-      return perms.includes(permission);
-    } catch {
-      return false;
+      const query = `
+        SELECT VALUE COUNT(1) FROM c
+        WHERE c.user_id = @userId AND c.role = @role
+      `;
+      const params = [
+        { name: '@userId', value: userId },
+        { name: '@role', value: role },
+      ];
+      const result = await this.dbService.queryItems<number>(PermissionService.CONTAINER, query, params);
+      const count = result[0] ?? 0;
+      logger.debug(`Permission check for user ${userId} role ${role}: ${count > 0}`);
+      return count > 0;
+    } catch (err:any) {
+      logger.error('Permission check failed:', err);
+      throw err;
     }
+  }
+
+  /** Grant a role to a user */
+  public async grantRole(userId: string, role: string): Promise<Permission> {
+    const newPermission: Permission = {
+      id: crypto.randomUUID(),
+      user_id: userId,
+      role,
+      granted_at: new Date().toISOString(),
+    };
+    return await this.dbService.createItem(PermissionService.CONTAINER, newPermission);
   }
 }

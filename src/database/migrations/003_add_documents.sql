@@ -1,8 +1,12 @@
-CREATE TABLE documents (
-    document_id    UUID PRIMARY KEY,
-    user_id        UUID NOT NULL,
-    title          TEXT NOT NULL,
-    file_path      TEXT NOT NULL,
-    uploaded_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- ------------------------------------------------------------
+-- Documents table - stores knowledgebase items
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS documents (
+    id VARCHAR(36) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
 );

@@ -1,50 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import Layout from '../Common/Layout';
-import { mockUsers } from '../../utils/mockData';
-import { useAuth } from '../../hooks/useAuth';
-import { AuthUser } from '../../types/auth.types';
+import axios from 'axios';
 
-const handleLogout = () => {
-  console.log('Logout placeholder  no real auth');
-};
+interface UserProfileProps {
+  /** Optional user id - if omitted, the component will use the loggedin user from the auth context */
+  userId?: string;
+}
 
 /**
- * Simple userprofile dropdown used in the navigation bar.
- * Shows avatar, name and a handleLogout button.
+ * Displays the loggedin user's name and department.
+ * Handles loading & error states and logs to console for debugging.
  */
-export const UserProfile: React.FC = () => {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<AuthUser | null>(null);
+const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
+  const [name, setName] = useState<string>('');
+  const [department, setDepartment] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    setProfile(user);
-  }, [user]);
+    const fetchProfile = async () => {
+      try {
+        const endpoint = userId
+          ? `/api/users/${encodeURIComponent(userId)}`
+          : '/api/users/me';
+        console.log(`[UserProfile] Fetching profile from ${endpoint}`);
+        const response = await axios.get(endpoint);
+        const { name, department } = response.data;
+        setName(name);
+        setDepartment(department);
+        setLoading(false);
+      } catch (err:any) {
+        console.error('[UserProfile] Error fetching profile:', err);
+        setError(err?.response?.data?.message ?? 'Unable to load profile');
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [userId]);
 
-  if (!profile) {
-    return null; // nothing to render when not logged in
+  if (loading) {
+    return <div className="p-4">Loading profile...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-red-600">Error: {error}</div>;
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <img
-        src={profile.avatar}
-        alt={profile.name}
-        className="w-8 h-8 rounded-full"
-      />
-      <span>{profile.name}</span>
-      <button
-        className="ml-2 text-sm text-gray-600 hover:underline"
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
+    <div className="p-4 bg-white rounded shadow">
+      <h2 className="text-xl font-semibold">Welcome, {name}!</h2>
+      <p className="text-gray-600">Department: {department}</p>
     </div>
   );
 };
 
-// FIXED placeholder minimal valid React component
-export const Placeholder = () => {
-  return <div>Placeholder component for ${__dirname}</div>;
-};
-
-export default Placeholder;
+export default UserProfile;

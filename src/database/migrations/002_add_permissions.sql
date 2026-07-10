@@ -1,13 +1,10 @@
-CREATE TABLE permissions (
-    permission_id  UUID PRIMARY KEY,
-    role           TEXT NOT NULL,
-    resource       TEXT NOT NULL,
-    can_read       BOOLEAN NOT NULL DEFAULT FALSE,
-    can_write      BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- ------------------------------------------------------------
+-- Permissions table
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS permissions (
+    id VARCHAR(36) PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
-INSERT INTO permissions (permission_id, role, resource, can_read, can_write)
-VALUES
-    (gen_random_uuid(), 'admin', 'help', TRUE, TRUE),
-    (gen_random_uuid(), 'user',  'help', TRUE, FALSE);
