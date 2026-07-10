@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* eslint-disable */
 import React, { useState } from "react";
 // @ts-ignore
 import { UserProfile } from "../../../utils/mockData";

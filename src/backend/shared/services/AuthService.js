@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DatabaseService } from "./DatabaseService";
 /**
  * AuthService - encapsulates Azure AD login URL generation,

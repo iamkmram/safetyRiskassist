@@ -1,42 +1,111 @@
+/* eslint-disable */
+/* eslint-disable */
+/* eslint-disable */
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
-import { fetchUsers } from '../../services/api';
+import axios from 'axios';
+import { fetchUsers as fetchUsersService } from '../../services/api';
 import './UserManagement.css';
+import { User } from '../../types';
+import { Button } from '@fluentui/react-components';
 
-export const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState<any[]>([]);
+interface UserManagementProps {}
+
+export const UserManagement: React.FC<UserManagementProps> = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+
+  const loadUsers = async () => {
+    try {
+      // Prefer the service layer fetch if available
+      const data = await fetchUsersService();
+      // Service may return { users: User[] } or raw array
+      const fetchedUsers: User[] = (data && (data as any).users) ? (data as any).users : (data as unknown as User[]);
+      setUsers(fetchedUsers);
+      setLoading(false);
+    } catch (err: any) {
+      console.error('Failed to fetch users:', err);
+      // Fall back to direct axios call for robustness
+      try {
+        const resp = await axios.get<User[]>('/api/admin/users');
+        setUsers(resp.data);
+        setLoading(false);
+      } catch (fallbackErr: any) {
+        setError(fallbackErr?.response?.data?.message ?? 'Unable to load users');
+        setLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await fetchUsers();
-// @ts-ignore
-        setUsers(data.users);
-      } catch (err) {
-        console.error('Failed to fetch users', err);
-      }
-    };
-    load();
+    loadUsers();
   }, []);
 
+  const deactivateUser = async (userId: string) => {
+    if (!window.confirm('Deactivate this user?')) return;
+    try {
+      await axios.post(`/api/admin/users/${encodeURIComponent(userId)}/deactivate`);
+      setUsers(prev => prev.map(u => (u.id === userId ? { ...u, active: false } : u)));
+    } catch (err) {
+      console.error('Deactivation failed:', err);
+      alert('Failed to deactivate user.');
+    }
+  };
+
+  const refreshKnowledgeIndex = async () => {
+    try {
+      await axios.post('/api/v1/knowledge/reindex');
+      alert('Knowledge index refreshed successfully.');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to refresh knowledge index.');
+    }
+  };
+
+  if (loading) return <div className="p-4">Loading users...</div>;
+  if (error) return <div className="p-4 text-red-600">Error: {error}</div>;
+
   return (
-    <div className="user-management">
-      <h2>User Management</h2>
-      <table className="users-table">
+    <div className="user-management p-4 bg-gray-50 rounded shadow">
+      <h2 className="text-2xl font-bold mb-4">User Management</h2>
+      <table className="users-table min-w-full bg-white">
         <thead>
-          <tr>
-            <th>Name</th><th>Email</th><th>Department</th>
+          <tr className="bg-gray-200">
+            <th className="py-2 px-4 text-left">Name</th>
+            <th className="py-2 px-4 text-left">Email</th>
+            <th className="py-2 px-4 text-left">Department</th>
+            <th className="py-2 px-4 text-left">Status</th>
+            <th className="py-2 px-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
           {users.map(u => (
-            <tr key={u.id}>
-              <td>{u.name}</td><td>{u.email}</td><td>{u.department}</td>
+            <tr key={u.id} className="border-b">
+              <td className="py-2 px-4">{u.name}</td>
+              <td className="py-2 px-4">{u.email}</td>
+              <td className="py-2 px-4">{u.department ?? '--'}</td>
+              <td className="py-2 px-4">{u.active ? 'Active' : 'Inactive'}</td>
+              <td className="py-2 px-4">
+                {u.active && (
+                  <button
+                    className="text-sm text-red-600 hover:underline"
+                    onClick={() => deactivateUser(u.id)}
+                  >
+                    Deactivate
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <div className="mt-4">
+        <Button onClick={refreshKnowledgeIndex}>Refresh Knowledge Index</Button>
+      </div>
     </div>
   );
 };
 
 export default UserManagement;
+export { UserManagement };

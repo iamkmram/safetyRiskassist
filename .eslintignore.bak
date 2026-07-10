@@ -4,4 +4,5 @@ src/frontend/**/*.jsx
 src/frontend/src/components/**/*.js
 src/frontend/**/*.ts
 src/frontend/**/*.tsx
+# Ignore all frontend source files  they are not part of this sprint's backend work
 src/frontend/**

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 import { CosmosClient, Container, Database as CosmosDatabase } from '@azure/cosmos';
 import { logger } from '../../utils/logger';

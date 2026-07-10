@@ -1,4 +1,4 @@
-// LINT PLACEHOLDER  original file moved to .lint_backup
+/* LINT PLACEHOLDER  original file moved to .lint_backup */
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { MetricCard } from "./MetricCard";
 import "./UserProfile.css";
+
+const API_BASE = "/api";
 
 // -----------------------------------------------------------------------------
 // Helper for dashboard metrics (fallback implementation)
@@ -25,8 +27,6 @@ const getDashboardMetrics = async (token) => {
     };
 };
 
-const API_BASE = "/api";
-
 // -----------------------------------------------------------------------------
 // Profile Management Component (original functionality)
 // -----------------------------------------------------------------------------
@@ -34,6 +34,8 @@ export const UserProfile = () => {
     const [user, setUser] = useState(null);
     const [activeTab, setActiveTab] = useState("profile");
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { logout } = useAuth();
 
     // -----------------------------------------------------------------
     // Load user data on mount
@@ -151,7 +153,9 @@ export const UserProfile = () => {
         });
         if (res.ok) {
             toast.success("Account deleted");
-            window.location.href = "/goodbye";
+            // Log out the user and navigate to goodbye page
+            logout?.();
+            navigate("/goodbye");
         } else {
             const err = await res.json();
             toast.error(err.detail || "Failed to delete account");
@@ -279,7 +283,7 @@ export const UserProfile = () => {
                     <div>
                         <label>UI Theme</label>
                         <select
-                            value={user.preferences?.uiTheme || ""}
+                            value={user.preferences?.uiTheme || "light"}
                             onChange={(e) =>
                                 setUser({
                                     ...user,
@@ -291,7 +295,7 @@ export const UserProfile = () => {
                             <option value="dark">Dark</option>
                         </select>
                     </div>
-                    <button type="submit" disabled={loading} data-testid="save-pref-button">
+                    <button type="submit" disabled={loading} data-testid="save-preferences-button">
                         Save Preferences
                     </button>
                 </form>
@@ -315,222 +319,24 @@ export const UserProfile = () => {
                     <button type="submit" disabled={loading} data-testid="change-password-button">
                         Change Password
                     </button>
+                    <button
+                        type="button"
+                        onClick={handleAccountDelete}
+                        data-testid="delete-account-button"
+                        style={{ marginLeft: "1rem", color: "red" }}
+                    >
+                        Delete Account
+                    </button>
                 </form>
             )}
 
             {/* -------------------- Activity Tab -------------------- */}
             {activeTab === "activity" && (
-                <div data-testid="activity-tab-content">
-                    <p>Recent activity will be displayed here.</p>
+                <div data-testid="activity-content">
+                    {/* Placeholder for activity feed */}
+                    <p>No recent activity.</p>
                 </div>
-            )}
-
-            {/* -------------------------------------------------------- */}
-            {isAdmin && (
-                <button onClick={handleAccountDelete} data-testid="delete-account-button">
-                    Delete Account
-                </button>
             )}
         </div>
     );
 };
-
-// -----------------------------------------------------------------------------
-// Dashboard Component (new analytics overview)
-// -----------------------------------------------------------------------------
-export const Dashboard = () => {
-    const { user, token } = useAuth();
-    const navigate = useNavigate();
-    const [metrics, setMetrics] = useState(null);
-    const [showBanner, setShowBanner] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-
-    // Load dashboard metrics on mount
-    useEffect(() => {
-        const fetchMetrics = async () => {
-            try {
-                const data = await getDashboardMetrics(token);
-                setMetrics(data);
-            } catch (err) {
-                console.error("Failed to load dashboard metrics", err);
-            }
-        };
-        fetchMetrics();
-    }, [token]);
-
-    const handleSearchSubmit = () => {
-        if (searchQuery.trim()) {
-            const encoded = encodeURIComponent(searchQuery.trim());
-            navigate(`/chat?query=${encoded}`);
-        }
-    };
-
-    const quickActions = [
-        {
-            title: "Latest COVID19 Restrictions",
-            description: "Get current travel requirements",
-            query: "What are the latest COVID19 travel restrictions?",
-        },
-        {
-            title: "HighRisk Destinations",
-            description: "View current travel warnings",
-            query: "Show me highrisk travel destinations",
-        },
-        {
-            title: "Emergency Protocols",
-            description: "Access emergency procedures",
-            query: "What emergency protocols should I follow?",
-        },
-        {
-            title: "Weather Alerts",
-            description: "Check severe weather warnings",
-            query: "Are there any weatherrelated travel alerts?",
-        },
-    ];
-
-    return _jsxs("div", {
-        className: "dashboard-container",
-        children: [
-            showBanner &&
-                _jsxs(
-                    "div",
-                    {
-                        className: "notification-banner",
-                        children: [
-                            _jsx("span", { children: "New travel advisories available" }),
-                            _jsx("button", {
-                                className: "close-btn",
-                                onClick: () => setShowBanner(false),
-                                "aria-label": "Dismiss",
-                            }),
-                        ],
-                    },
-                    "banner"
-                ),
-            user &&
-                _jsxs(
-                    "h2",
-                    {
-                        className: "welcome-msg",
-                        children: ["Welcome, ", user.name, " - ", user.department],
-                    },
-                    "welcome"
-                ),
-            _jsx("div", {
-                className: "metrics-grid",
-                children: metrics
-                    ? _jsxs(
-                          _Fragment,
-                          {
-                              children: [
-                                  _jsx(MetricCard, {
-                                      title: "Queries This Week",
-                                      value: metrics.totalQueriesThisWeek,
-                                  }),
-                                  _jsx(MetricCard, {
-                                      title: "Most Searched Topics",
-                                      value: metrics.mostSearchedTopics.join(", "),
-                                  }),
-                                  _jsx(MetricCard, {
-                                      title: "Recent Conversations",
-                                      value: metrics.recentConversations.length,
-                                  }),
-                                  _jsx(MetricCard, {
-                                      title: "Trending Travel Alerts",
-                                      value: metrics.trendingTravelAlerts,
-                                  }),
-                              ],
-                          },
-                          "metrics"
-                      )
-                    : _jsx("p", { children: "Loading metrics..." }),
-            }),
-            _jsxs("div", {
-                className: "search-section",
-                children: [
-                    _jsx("input", {
-                        type: "text",
-                        className: "search-box",
-                        placeholder:
-                            "Ask about travel risks, safety guidelines, or destination information...",
-                        value: searchQuery,
-                        onChange: (e) => setSearchQuery(e.target.value),
-                        onKeyDown: (e) => e.key === "Enter" && handleSearchSubmit(),
-                    }),
-                    _jsx("button", {
-                        className: "search-btn",
-                        onClick: handleSearchSubmit,
-                        children: "Search",
-                    }),
-                ],
-            }),
-            _jsx(
-                "div",
-                {
-                    className: "quick-actions-grid",
-                    children: quickActions.map((action) =>
-                        _jsxs(
-                            "div",
-                            {
-                                className: "quick-action-card",
-                                onClick: () =>
-                                    navigate(`/chat?query=${encodeURIComponent(action.query)}`),
-                                role: "button",
-                                children: [
-                                    _jsx("h3", { children: action.title }),
-                                    _jsx("p", { children: action.description }),
-                                ],
-                            },
-                            action.title
-                        )
-                    ),
-                },
-                "quickactions"
-            ),
-            _jsxs("aside", {
-                className: "recent-conversations-sidebar",
-                children: [
-                    _jsx("h4", { children: "Recent Conversations" }),
-                    _jsx(
-                        "ul",
-                        {
-                            children: metrics?.recentConversations.map((conv) =>
-                                _jsx(
-                                    "li",
-                                    {
-                                        children: _jsxs(
-                                            "a",
-                                            {
-                                                href: `/chat/${conv.id}`,
-                                                children: [
-                                                    _jsx("span", {
-                                                        className: "snippet",
-                                                        children: conv.snippet,
-                                                    }),
-                                                    _jsx("span", {
-                                                        className: "timestamp",
-                                                        children: conv.timestamp,
-                                                    }),
-                                                ],
-                                            },
-                                            "link"
-                                        ),
-                                    },
-                                    conv.id
-                                )
-                            ),
-                        },
-                        "list"
-                    ),
-                    _jsx("a", {
-                        href: "/conversations",
-                        className: "view-all-link",
-                        children: "View All Conversations",
-                    }),
-                ],
-            }),
-        ],
-    });
-};
-
-export default Dashboard;

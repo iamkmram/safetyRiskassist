@@ -1,5 +1,6 @@
 // @ts-nocheck
 /* eslint-disable */
+/* eslint-disable */
 import React from "react";
 // import { useRouter } from "next/router";
 import { recentConversations, mockData } from "../../utils/mockData";

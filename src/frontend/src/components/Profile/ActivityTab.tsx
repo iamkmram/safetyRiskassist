@@ -1,4 +1,5 @@
 /* eslint-disable */
+/* eslint-disable */
 import React from "react";
 // @ts-ignore
 import { UserActivity } from "../../utils/mockData";

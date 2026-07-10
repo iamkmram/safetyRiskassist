@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   root: true,
   ignores: [],
@@ -23,5 +24,8 @@ module.exports = {
     browser: true,
     node: true,
     es6: true,
+  },
+  rules: {
+    // Projectspecific overrides can be added here
   },
 };

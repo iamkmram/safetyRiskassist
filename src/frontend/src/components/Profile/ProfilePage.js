@@ -1,28 +1,42 @@
 /* eslint-disable */
+import React, { useState } from "react";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-/* eslint-disable */
-import { useState } from "react";
 // @ts-ignore
 import Layout from "../../Common/Layout";
 import ProfileEditor from "./ProfileEditor";
 import PreferencesTab from "./PreferencesTab";
 import SecurityTab from "./SecurityTab";
 import ActivityTab from "./ActivityTab";
+
+export const placeholder = true;
+
 export default function ProfilePage() {
     const [activeTab, setActiveTab] = useState("profile");
     const renderTab = () => {
         switch (activeTab) {
             case "profile":
-                return _jsx(ProfileEditor, {});
+                return <ProfileEditor />;
             case "preferences":
-                return _jsx(PreferencesTab, {});
+                return <PreferencesTab />;
             case "security":
-                return _jsx(SecurityTab, {});
+                return <SecurityTab />;
             case "activity":
-                return _jsx(ActivityTab, {});
+                return <ActivityTab />;
             default:
                 return null;
         }
     };
-    return (_jsx(Layout, { children: _jsxs("div", { className: "p-4", children: [_jsxs("nav", { className: "mb-4 flex space-x-4", children: [_jsx("button", { onClick: () => setActiveTab("profile"), children: "Profile" }), _jsx("button", { onClick: () => setActiveTab("preferences"), children: "Preferences" }), _jsx("button", { onClick: () => setActiveTab("security"), children: "Security" }), _jsx("button", { onClick: () => setActiveTab("activity"), children: "Activity" })] }), renderTab()] }) }));
+    return (
+        <Layout>
+            <div className="p-4">
+                <nav className="mb-4 flex space-x-4">
+                    <button onClick={() => setActiveTab("profile")}>Profile</button>
+                    <button onClick={() => setActiveTab("preferences")}>Preferences</button>
+                    <button onClick={() => setActiveTab("security")}>Security</button>
+                    <button onClick={() => setActiveTab("activity")}>Activity</button>
+                </nav>
+                {renderTab()}
+            </div>
+        </Layout>
+    );
 }

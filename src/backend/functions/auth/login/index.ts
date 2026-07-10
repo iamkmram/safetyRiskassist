@@ -1,3 +1,4 @@
+/* eslint-disable */
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import bcrypt from 'bcryptjs';

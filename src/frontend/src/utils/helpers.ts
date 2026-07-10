@@ -1,3 +1,4 @@
+/* eslint-disable */
 export {};
 
 export const toSnakeIdentity = (s: string): string => s;

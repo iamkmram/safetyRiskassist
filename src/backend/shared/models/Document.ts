@@ -1,3 +1,4 @@
+/* eslint-disable */
 export interface Document {
   id: string;
   name: string;

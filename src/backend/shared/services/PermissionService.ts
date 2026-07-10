@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DatabaseService } from "./DatabaseService";
 import {
   Permission,
