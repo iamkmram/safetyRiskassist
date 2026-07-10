@@ -1,0 +1,8 @@
+
+Oops! Something went wrong! :(
+
+ESLint: 10.6.0
+
+No files matching the pattern "backend/functions/documents backend/shared" were found.
+Please check for typing mistakes in the pattern.
+
