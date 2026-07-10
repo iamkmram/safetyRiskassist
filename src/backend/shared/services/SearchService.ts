@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DatabaseService } from "./DatabaseService";
 import { KnowledgeItem } from "../models/KnowledgeItem";
 

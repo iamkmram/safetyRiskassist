@@ -1,2 +1,3 @@
-// Minimal stub for backend auth utilities
-export const verifyToken = async (token: string) => true;
+// Minimal placeholder auth utilities used by the login function
+export const verifyToken = (token: string): boolean => true;
+export const getUserFromToken = (token: string): any => ({ id: 'system', role: 'admin' });

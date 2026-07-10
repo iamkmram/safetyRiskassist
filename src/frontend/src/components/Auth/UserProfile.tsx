@@ -1,6 +1,6 @@
+import React, { FC, useEffect, useState } from "react";
+import axios from "axios";
 /* eslint-disable */
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks/useAuth';
 import { AuthUser } from '../../types/auth.types';
@@ -489,11 +489,9 @@ export default UserProfile;
 // Placeholder component (BASE)
 // -------------------------------------------------------------------
 export const Placeholder = () => {
-  return <div>Placeholder component for ${__dirname}</div>;
+  return <div>Placeholder component for ${.}</div>;
 };
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Avatar, Text } from '@fluentui/react-components';
 
 export const UserProfile: React.FC = () => {

@@ -40,7 +40,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
 // FIXED placeholder minimal valid React component
 export const Placeholder = () => {
-  return <div>Placeholder component for {__dirname}</div>;
+  return <div>Placeholder component for {.}</div>;
 };
 
 export default Placeholder;

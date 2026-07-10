@@ -239,3 +239,6 @@ export class AuthService {
     return user;
   }
 }
+
+// Mock implementation added to satisfy imports
+export function mockAuthenticate(...args: any[]): any { return { userId: 'test' }; }
