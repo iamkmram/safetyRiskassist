@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 // Ambient module declarations required for backend compilation.
 // Relative paths are NOT allowed in ambient declarations, so we expose
 // simple module names that match the import statements used in the code.

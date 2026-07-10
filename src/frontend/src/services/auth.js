@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 export const __authServiceModuleFix = true;
 // Stub login implementation added by fix script
 export const login = async (username, password) => {

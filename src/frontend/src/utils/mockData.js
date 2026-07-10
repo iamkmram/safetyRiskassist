@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 export const mockUsers = [
     {
         id: 'user-001',

@@ -1,5 +1,5 @@
-/* eslint-disable */
-/* eslint-disable */
+ 
+ 
 // LINT PLACEHOLDER original file moved to .lint_backup
 import React from "react";
 import { UserActivity } from "../../../utils/mockData";

@@ -1,5 +1,5 @@
-/* eslint-disable */
-/* eslint-disable */
+ 
+ 
 // @ts-nocheck
 import React from "react";
 import { helpArticles } from "../../utils/mockData";

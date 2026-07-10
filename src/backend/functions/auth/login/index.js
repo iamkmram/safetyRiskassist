@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import jwt from "jsonwebtoken";
 import { getSettings } from "../../../config";
 const settings = getSettings();

@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 /**
  * Placeholder script that would normally provision Azure AI Search
  * index and attach it to the Cosmos DB container.

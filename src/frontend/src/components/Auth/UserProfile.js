@@ -2,7 +2,7 @@
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
-/* eslint-disable */
+ 
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { toSnake, toCamel } from "../../utils/helpers";

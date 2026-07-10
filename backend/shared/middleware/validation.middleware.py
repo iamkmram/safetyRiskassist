@@ -1,8 +1,16 @@
-from fastapi import Request, Response
+from fastapi import FastAPI, Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
+import json
 
-class ValidationMiddleware(BaseHTTPMiddleware):
+class RequestValidator(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # TODO: implement validation specific logic
-        response = await call_next(request)
-        return response
+        if request.method in ("POST", "PUT", "PATCH"):
+            try:
+                await request.json()
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid JSON payload")
+        return await call_next(request)
+
+def add_validation(app: FastAPI) -> None:
+    app.add_middleware(RequestValidator)
+

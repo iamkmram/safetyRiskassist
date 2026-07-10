@@ -1,36 +1,20 @@
-/* eslint-disable */
 module.exports = {
   root: true,
-  ignorePatterns: ["*", "src/frontend/**", "src/frontend/src/**"],
-  env: {
-    browser: true,
-    node: true,
-    es6: true,
-    es2020: true,
-  },
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: "module",
-    ecmaFeatures: {
-      jsx: true,
-    },
+    sourceType: 'module',
   },
-  languageOptions: {
-    parser: require("espree"),
-    ecmaVersion: 2020,
-    sourceType: "module",
+  env: {
+    node: true,
+    es6: true,
   },
-  plugins: ["@typescript-eslint", "react"],
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
-  settings: {
-    react: { version: "detect" },
-  },
+  plugins: ['@typescript-eslint'],
   rules: {
-    // Projectspecific overrides can be added here
+    // Add projectspecific rule overrides here
   },
 };

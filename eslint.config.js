@@ -1,34 +1,23 @@
-/* eslint-disable */
-// ESLint flat config merging backend TypeScript linting and frontend JS ignore rules
+import tsParser from '@typescript-eslint/parser';
 
-module.exports = [
+export default [
   {
-    // Target backend TypeScript source files
-    files: ["backend/**/*.ts", "backend/**/*.tsx"],
-    // Do not ignore any files for backend linting
-    ignores: [],
+    // Apply to all JavaScript/TypeScript source files
+    files: ['**/*.{js,jsx,ts,tsx}'],
     languageOptions: {
-      parser: "@typescript-eslint/parser",
+      parser: tsParser,
       parserOptions: {
-        project: "./backend/tsconfig.json",
-        tsconfigRootDir: __dirname,
+        ecmaVersion: 2020,
+        sourceType: 'module',
       },
+      // Define globals here if needed, e.g.:
+      // globals: { process: 'readonly', __dirname: 'readonly' },
     },
-    plugins: {
-      "@typescript-eslint": require("@typescript-eslint/eslint-plugin"),
-    },
-    // Example rule set – feel free to extend
+    // No \"env\" key  flat config uses languageOptions.globals instead
+    // You can extend recommended rules via plugins; keeping it minimal here
     rules: {
-      "no-console": "off",
-      "@typescript-eslint/no-explicit-any": "warn",
+      // Example: enforce semicolons
+      // 'semi': ['error', 'always'],
     },
-  },
-  {
-    // Ignore all .js files inside src/frontend/src (they contain JSX)
-    ignores: ["src/frontend/src/**/*.js"],
-  },
-  {
-    // Ignore everything under src/backend (including functions, shared, etc.)
-    ignores: ["src/backend/**"],
   },
 ];

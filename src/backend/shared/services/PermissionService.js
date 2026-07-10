@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { getConnection } from "typeorm";
 import { UserRole } from "../models/UserRole";
 /**

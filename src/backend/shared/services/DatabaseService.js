@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { getConnection } from "typeorm";
 import { UserPreferences } from "../models/UserPreferences";
 import { UserActivity } from "../models/UserActivity";

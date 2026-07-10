@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // import { useRouter } from "next/router";
 import { useNavigate } from "react-router-dom";

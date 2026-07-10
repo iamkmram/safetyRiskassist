@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 /**
  * Placeholder script that would normally provision Azure Cosmos DB
  * and create necessary containers/collections.

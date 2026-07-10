@@ -2,7 +2,7 @@
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
-/* eslint-disable */
+ 
 import React from 'react';
 import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
 import { Navigate } from 'react-router-dom';

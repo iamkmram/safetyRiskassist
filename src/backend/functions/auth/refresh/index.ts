@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { AuthService, AuthError } from '../../../shared/services/AuthService';
 

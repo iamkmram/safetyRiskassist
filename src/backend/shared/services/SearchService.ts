@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 // @ts-nocheck
 import { DatabaseService } from "./DatabaseService";
 import { PermissionService } from "./PermissionService";

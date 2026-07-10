@@ -1,0 +1,30 @@
+import tsParser from '@typescript-eslint/parser';
+
+export default [
+  {
+    // Apply to all JS/TS source files
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+      },
+    },
+    env: {
+      node: true,
+      es6: true,
+    },
+    // Use recommended rules from ESLint and @typescript-eslint
+    extends: [
+      'eslint:recommended',
+      'plugin:@typescript-eslint/recommended',
+    ],
+    plugins: {
+      '@typescript-eslint': tsParser,
+    },
+    rules: {
+      // Projectspecific rule overrides can be added here
+    },
+  },
+];
