@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 // @ts-ignore
 // @ts-ignore
-import { UserPreferences } from "../../../utils/mockData";
+import { any } from "../../../utils/mockData";
 
 export default function PreferencesTab() {
-  const [prefs, setPrefs] = useState<UserPreferences>(UserPreferences);
+  const [prefs, setPrefs] = useState<any>(any);
 
   const handleToggle = (field: keyof typeof prefs.notifications) => {
     setPrefs({
