@@ -275,10 +275,17 @@ export class AuthService {
 export function mockAuthenticate(...args: any[]): any { return { userId: 'test' }; }
 
 /**
- * Stub implementation of getUserByUsername.
- * The real logic should query the user store and return a User object.
+ * Unified getUserByUsername implementation.
+ * Combines stub behavior (return null) with legacy wrapper that attempts to delegate
+ * to an AuthService method if present.
  */
 export async function getUserByUsername(username: string): Promise<any> {
-  // TODO: replace with actual lookup
-  return null;
+  // Attempt to delegate to a method on AuthService if it exists.
+  const svc = new AuthService();
+  const maybe = (svc as any).getUserByUsername?.(username);
+  if (maybe instanceof Promise) {
+    return await maybe;
+  }
+  // If delegation yields undefined/null, fall back to stub behavior.
+  return maybe ?? null;
 }
