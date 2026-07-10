@@ -65,7 +65,7 @@ export class AuthService {
   static async mockLogin(): Promise<User> {
 //     const rows = await DatabaseService.query<User>("SELECT * FROM auth_user WHERE id = ?", [
 //       "user-001",
-    ]);
+//     ]);
     if (rows.length === 0) {
       throw new Error("Mock user not found");
     }
