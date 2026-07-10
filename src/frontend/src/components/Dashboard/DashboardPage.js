@@ -1,50 +1,26 @@
-/* eslint-disable */
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-// import { useRouter } from "next/router";
-import { useNavigate } from "react-router-dom";
-import Layout from "../Common/Layout";
-import MetricsCard from "./MetricsCard";
-import RecentActivity from "./RecentActivity";
-import { mockMetrics } from "../../utils/mockData";
-const quickActions = [
-    {
-        title: "Latest COVID-19 Restrictions",
-        description: "Get current travel requirements",
-        query: "What are the latest COVID-19 travel restrictions?",
-        route: "/chat",
-    },
-    {
-        title: "High-Risk Destinations",
-        description: "View current travel warnings",
-        query: "Show me high-risk travel destinations",
-        route: "/chat",
-    },
-    {
-        title: "Emergency Protocols",
-        description: "Access emergency procedures",
-        query: "What emergency protocols should I follow?",
-        route: "/chat",
-    },
-    {
-        title: "Weather Alerts",
-        description: "Check severe weather warnings",
-        query: "Are there any weather-related travel alerts?",
-        route: "/chat",
-    },
-];
-export default function DashboardPage() {
-    const router = useRouter();
-    const navigate = useNavigate();
-    // Initial redirect as in original implementation
-    router.push("/alerts");
-    const handleChat = () => router.push("/chat");
-    const handleConversations = () => router.push("/conversations");
-    const handleKnowledge = () => router.push("/knowledge");
-    const handleUpload = () => router.push("/documents/upload");
-    const handleAlerts = () => router.push("/alerts");
-    const handleQuickAction = (action) => {
-        navigate(action.route, { state: { prefill: action.query } });
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+const Layout_1 = __importDefault(require("../../components/Common/Layout"));
+const mockData_1 = require("../../utils/mockData");
+const MetricsCard_1 = __importDefault(require("./MetricsCard"));
+const QuickActions_1 = __importDefault(require("./QuickActions"));
+const RecentActivity_1 = __importDefault(require("./RecentActivity"));
+const react_router_dom_1 = require("react-router-dom");
+const DashboardPage = () => {
+    const navigate = (0, react_router_dom_1.useNavigate)();
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const input = form.elements.namedItem("search");
+        const query = input.value.trim();
+        if (query) {
+            navigate("/chat", { state: { prefilledQuery: query } });
+        }
     };
-    const handleNav = (path) => router.push(path);
-    return (_jsxs(Layout, { children: [_jsx("section", { className: "welcome", children: _jsx("h1", { children: "Welcome, User" }) }), _jsx("section", { className: "metrics", children: _jsx(MetricsCard, { metrics: mockMetrics }) }), _jsx("section", { className: "search", children: _jsx("input", { type: "text", placeholder: "Ask about travel risks, safety guidelines, or destination information...", autoFocus: true, className: "w-full p-2 border rounded", onKeyDown: e => e.key === "Enter" && handleNav("/chat") }) }), _jsx("section", { className: "quick-actions grid grid-cols-2 gap-4 mt-4", children: quickActions.map(action => (_jsxs("div", { className: "p-4 border rounded cursor-pointer hover:bg-gray-100", onClick: () => handleQuickAction(action), children: [_jsx("h3", { className: "font-semibold", children: action.title }), _jsx("p", { className: "text-sm text-gray-600", children: action.description })] }, action.title))) }), _jsxs("section", { className: "shortcuts flex space-x-4 mt-6", children: [_jsx("button", { onClick: handleChat, children: "Go to Chat" }), _jsx("button", { onClick: handleConversations, children: "View All Conversations" }), _jsx("button", { onClick: handleKnowledge, children: "Browse Knowledge Base" }), _jsx("button", { onClick: handleUpload, children: "Upload Document" }), _jsx("button", { onClick: handleAlerts, children: "Travel Alerts" })] }), _jsx("aside", { className: "recent-activity mt-6", children: _jsx(RecentActivity, {}) })] }));
-}
+    return ((0, jsx_runtime_1.jsxs)(Layout_1.default, { children: [(0, jsx_runtime_1.jsxs)("div", { className: "bg-yellow-100 p-2 text-center", children: [(0, jsx_runtime_1.jsx)("span", { children: "New travel advisories are available." }), (0, jsx_runtime_1.jsx)("button", { className: "ml-4 underline", onClick: () => { }, children: "Dismiss" })] }), (0, jsx_runtime_1.jsxs)("header", { className: "my-4", children: [(0, jsx_runtime_1.jsxs)("h1", { className: "text-2xl font-bold", children: ["Welcome, ", "John Doe"] }), (0, jsx_runtime_1.jsxs)("p", { className: "text-gray-600", children: ["Department: ", "Travel Ops"] })] }), (0, jsx_runtime_1.jsxs)("section", { className: "grid grid-cols-2 gap-4 mb-6", children: [(0, jsx_runtime_1.jsx)(MetricsCard_1.default, { title: "Total Queries This Week", value: mockData_1.dashboardMetrics.totalQueries }), (0, jsx_runtime_1.jsx)(MetricsCard_1.default, { title: "Weekly Queries", value: mockData_1.dashboardMetrics.weeklyQueries }), (0, jsx_runtime_1.jsx)(MetricsCard_1.default, { title: "Recent Conversations", value: mockData_1.dashboardMetrics.recentConversations.length }), (0, jsx_runtime_1.jsx)(MetricsCard_1.default, { title: "Active Alerts", value: mockData_1.dashboardMetrics.activeAlerts })] }), (0, jsx_runtime_1.jsx)("form", { onSubmit: handleSearch, className: "mb-6", children: (0, jsx_runtime_1.jsx)("input", { name: "search", type: "text", placeholder: "Ask about travel risks, safety guidelines, or destination information...", className: "w-full p-3 border rounded focus:outline-none focus:ring", autoFocus: true }) }), (0, jsx_runtime_1.jsx)("section", { className: "mb-6", children: (0, jsx_runtime_1.jsx)(QuickActions_1.default, {}) }), (0, jsx_runtime_1.jsxs)("div", { className: "flex", children: [(0, jsx_runtime_1.jsx)("div", { className: "flex-1 p-4 bg-white rounded shadow" }), (0, jsx_runtime_1.jsx)("aside", { className: "w-64 ml-4", children: (0, jsx_runtime_1.jsx)(RecentActivity_1.default, {}) })] })] }));
+};
+exports.default = DashboardPage;

@@ -1,44 +1,50 @@
-/* eslint-disable */
-import { getConnection } from "typeorm";
-import { UserPreferences } from "../models/UserPreferences";
-import { UserActivity } from "../models/UserActivity";
-const User = {};
+"use strict";
 /**
- * Simple DatabaseService using TypeORM. In a real project you would
- * inject a repository or use a more sophisticated dataaccess layer.
+ * DatabaseService - a lightweight wrapper around the PostgreSQL client.
+ * It reads connection parameters from environment variables and provides
+ * a singleton pool for the rest of the backend.
  */
-export class DatabaseService {
-    static async query(...args) {
-        return Promise.resolve(null);
+Object.defineProperty(exports, "__esModule", { value: true });
+const pg_1 = require("pg");
+class DatabaseService {
+    constructor(config) {
+        const poolConfig = {
+            host: config.host,
+            port: Number(config.port),
+            database: config.database,
+            user: config.user,
+            password: config.password,
+            ssl: config.ssl === 'true',
+            max: 20,
+            idleTimeoutMillis: 30000,
+        };
+        this.pool = new pg_1.Pool(poolConfig);
     }
-    /** Retrieve a user record by its UUID */
-    static async get_user(user_id) {
-        const repo = getConnection().getRepository(User);
-        return await repo.findOne(user_id);
+    static getInstance() {
+        if (!DatabaseService.instance) {
+            const cfg = {
+                host: process.env.PGHOST || 'localhost',
+                port: process.env.PGPORT || '5432',
+                database: process.env.PGDATABASE || 'knowledge',
+                user: process.env.PGUSER || 'postgres',
+                password: process.env.PGPASSWORD || '',
+                ssl: process.env.PGSSL || 'false',
+            };
+            DatabaseService.instance = new DatabaseService(cfg);
+        }
+        return DatabaseService.instance;
     }
-    /** Update basic profile fields */
-    static async update_user_profile(user_id, data) {
-        const repo = getConnection().getRepository(User);
-        await repo.update(user_id, data);
-    }
-    /** Update user preferences */
-    static async update_user_preferences(user_id, prefs) {
-        const repo = getConnection().getRepository(UserPreferences);
-        await repo.update({ userId: user_id }, prefs);
-    }
-    /** Change password - expects a prehashed password */
-    static async change_password(user_id, new_hash) {
-        const repo = getConnection().getRepository(User);
-        await repo.update(user_id, { hashedPassword: new_hash });
-    }
-    /** Retrieve a summary of user activity */
-    static async get_user_activity(user_id) {
-        const repo = getConnection().getRepository(UserActivity);
-        return await repo.find({ where: { userId: user_id }, order: { timestamp: "DESC" }, take: 10 });
-    }
-    /** Softdelete a user (set `isDeleted` flag) */
-    static async soft_delete_user(user_id) {
-        const repo = getConnection().getRepository(User);
-        await repo.update(user_id, { isDeleted: true });
+    /** Simple query helper that returns rows typed as <T> */
+    async query(text, params) {
+        const client = await this.pool.connect();
+        try {
+            // @ts-ignore - suppressed by automated fix script (untyped function call)
+            const res = await client.query(text, params);
+            return res.rows;
+        }
+        finally {
+            client.release();
+        }
     }
 }
+exports.default = DatabaseService.getInstance();

@@ -1,32 +1,30 @@
-// LINT PLACEHOLDER  original file moved to .lint_backup
-// This file intentionally contains no JSX to avoid ESLint parsing errors.
-export const placeholder = true;
-
-/* eslint-disable */
-import React from 'react';
-import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-
-export const AuthGuard = ({ children, guest = false }) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Placeholder = exports.AuthGuard = void 0;
+const jsx_runtime_1 = require("react/jsx-runtime");
+const react_router_dom_1 = require("react-router-dom");
+const useAuth_1 = require("../../hooks/useAuth");
+const AuthGuard = ({ children, guest = false, }) => {
     // @ts-ignore
-    const { user, loading, isAuthenticated } = useAuth();
+    const { user, loading, isAuthenticated } = (0, useAuth_1.useAuth)();
     // Preserve loading behavior from the original implementation.
     if (loading) {
-        return _jsx("div", { children: "Loading..." });
+        return (0, jsx_runtime_1.jsx)("div", { children: "Loading..." });
     }
     // Determine authentication status using either `user` or `isAuthenticated`.
     const authenticated = Boolean(user) || Boolean(isAuthenticated);
     // If the route is not for guests and the user is not authenticated, redirect.
     if (!guest && !authenticated) {
-        return _jsx(Navigate, { to: "/login", replace: true });
+        return (0, jsx_runtime_1.jsx)(react_router_dom_1.Navigate, { to: "/login", replace: true });
     }
     // Otherwise render the protected content.
-    return _jsx(_Fragment, { children: children });
+    return (0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: children });
 };
-
-export const Placeholder = () => {
-    return <div>Placeholder component for {__dirname}</div>;
+exports.AuthGuard = AuthGuard;
+// FIXED placeholder minimal valid React component
+const Placeholder = () => {
+    // Combine placeholder outputs from both versions
+    return (0, jsx_runtime_1.jsxs)("div", { children: ["Placeholder component for ", __dirname, '.'] });
 };
-
-export default Placeholder;
+exports.Placeholder = Placeholder;
+exports.default = exports.Placeholder;

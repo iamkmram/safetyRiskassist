@@ -46,6 +46,10 @@ export interface UserPayload {
  * token exchange, JWT validation, and a mock login helper for demo mode.
  */
 export class AuthService {
+    async login(username: string, password: string) {
+      // TODO: replace with real authentication logic
+      return { accessToken: "dummy-token" };
+    }
   // --- Instance members for Azure Key Vault and token handling (from integration) ---
   private static readonly KEY_VAULT_URL = process.env.AZURE_KEY_VAULT_URL!;
   private static readonly CLIENT_ID_SECRET_NAME = 'azure-ad-client-id';

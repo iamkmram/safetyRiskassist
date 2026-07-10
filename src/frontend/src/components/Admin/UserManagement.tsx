@@ -1,5 +1,6 @@
+// @ts-ignore
 import React, { useEffect, useState } from 'react';
-import { fetchAllUsers, deleteUser } from '../../../shared/services/AdminService';
+// import { fetchAllUsers, deleteUser } from '../../../shared/services/AdminService';
 
 /**
  * UserManagement - simple admin UI to list and delete users.

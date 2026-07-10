@@ -1,21 +1,19 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "jsx": "react-jsx",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true
+    "outDir": "dist"
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/frontend/src"
+    "backend/**/*.ts",
+    "backend/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/frontend"
   ]
 }

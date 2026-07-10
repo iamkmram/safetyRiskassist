@@ -1,29 +1,39 @@
-/* eslint-disable */
-import { getConnection } from "typeorm";
-import { UserRole } from "../models/UserRole";
+"use strict";
 /**
- * PermissionService - tiny helper around role checking.
- * In a production app you would have a full ACL system.
+ * PermissionService - evaluates whether a subject (user/role) is allowed
+ * to perform an action on a given resource.
+ * Uses the DatabaseService to read permission assignments.
  */
-export class PermissionService {
-    /** Does the given user have a specific permission? */
-    static async has_permission(user_id, permission) {
-        const repo = getConnection().getRepository(UserRole);
-        const role = await repo.findOne({ where: { userId: user_id } });
-        if (!role)
-            return false;
-        // Simple mapping - extend as needed
-        const rolePermissions = {
-            admin: ["admin_settings", "view_all"],
-            user: ["view_own"],
-        };
-        const perms = rolePermissions[role.role] || [];
-        return perms.includes(permission);
-    }
-    /** Helper used by the frontend to quickly know if a user is admin */
-    static async is_admin(user_id) {
-        const repo = getConnection().getRepository(UserRole);
-        const role = await repo.findOne({ where: { userId: user_id } });
-        return role?.role === "admin";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PermissionService = void 0;
+const DatabaseService_1 = __importDefault(require("./DatabaseService"));
+class PermissionService {
+    /**
+     * Checks if a subject is allowed to perform an action on a resource.
+     * Returns { allowed: true } or { allowed: false, reason?: string }
+     */
+    async evaluate(request) {
+        const { subjectId, resource, action } = request;
+        // Simple logic: a user inherits permissions via their roles.
+        const sql = `
+      SELECT 1
+      FROM user_roles ur
+      JOIN role_permissions rp ON ur.role_id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.user_id = $1
+        AND p.resource = $2
+        AND p.action = $3
+      LIMIT 1;
+    `;
+        const rows = await DatabaseService_1.default.query(sql, [subjectId, resource, action]);
+        const allowed = rows.length > 0;
+        return allowed
+            ? { allowed: true }
+            : { allowed: false, reason: 'Permission not found for the subject.' };
     }
 }
+exports.PermissionService = PermissionService;
+exports.default = new PermissionService();

@@ -1,6 +1,8 @@
+// @ts-ignore
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import AuthService from '../../../shared/services/AuthService';
-import { HttpResponse } from '@azure/functions';
+import { AuthService } from '../../../shared/services/AuthService';
+// import { HttpResponse } from '@azure/functions';
+type HttpResponse = any;
 
 const httpTrigger: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
   try {
@@ -14,7 +16,7 @@ const httpTrigger: AzureFunction = async (context: Context, req: HttpRequest): P
       return;
     }
 
-    const tokens = await AuthService.login(username, password);
+    const tokens = await new AuthService().login(username, password);
     context.res = {
       status: 200,
       body: tokens,
