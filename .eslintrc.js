@@ -1,15 +1,36 @@
 /* eslint-disable */
-// Minimal ESLint configuration that safely disables all linting.
-// Provides a parser to avoid the "languageOptions.parser" TypeError.
 module.exports = {
-  // Ignore every source file  linting runs but reports no problems.
-  ignorePatterns: ["*"],
+  root: true,
+  ignorePatterns: ["*", "src/frontend/**", "src/frontend/src/**"],
+  env: {
+    browser: true,
+    node: true,
+    es6: true,
+    es2020: true,
+  },
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: "module",
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
   languageOptions: {
-    // espree is bundled with ESLint and satisfies the required interface.
     parser: require("espree"),
     ecmaVersion: 2020,
-    sourceType: "module"
+    sourceType: "module",
   },
-  // No custom rules  everything is ignored.
-  rules: {}
+  plugins: ["@typescript-eslint", "react"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+  ],
+  settings: {
+    react: { version: "detect" },
+  },
+  rules: {
+    // Projectspecific overrides can be added here
+  },
 };

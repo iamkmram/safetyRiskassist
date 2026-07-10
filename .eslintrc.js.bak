@@ -1,10 +1,11 @@
 /* eslint-disable */
 module.exports = {
+  root: true,
   ignores: [],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
+    ecmaVersion: 2021,
+    sourceType: "module",
     ecmaFeatures: {
       jsx: true,
     },
@@ -23,6 +24,7 @@ module.exports = {
     browser: true,
     node: true,
     es6: true,
+    es2021: true,
   },
   rules: {
     // Projectspecific overrides can be added here
