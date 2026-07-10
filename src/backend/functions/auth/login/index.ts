@@ -5,8 +5,8 @@ import jwt from 'jsonwebtoken';
 import { DatabaseService } from '../../../shared/services/DatabaseService';
 import { User } from '../../../shared/types/database.types';
 import { logger } from '../../../../utils/logger';
-import { mockAuthenticate, AuthService } from '../../../shared/services/AuthService';
-import { getSettings } from '../../../config';
+import { mockAuthenticate, AuthService, AuthError } from '../../../shared/services/AuthService';
+import { getSettings, getUserByUsername } from '../../../config';
 import { hashPassword, verifyPassword } from '../../../utils/auth';
 
 /**
@@ -181,7 +181,7 @@ export const loginDemo: AzureFunction = async (context: Context, req: HttpReques
  *
  * Returns JSON containing the URL configured via the AZURE_AD_LOGIN_URL environment variable.
  */
-export const handler = async (
+export const loginUrlHandler = async (
   _event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> => {
   try {
@@ -200,13 +200,62 @@ export const handler = async (
   }
 };
 
-export default loginPassword;
+/**
+ * Azure Function handler for POST /api/v1/auth/login (prototype ROPC flow)
+ */
+export const handler: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+  const log = context.log;
+  try {
+    if (req.method !== 'POST') {
+      context.res = {
+        status: 405,
+        body: { error: 'method_not_allowed', detail: 'Only POST allowed', code: 405 },
+      };
+      return;
+    }
 
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import jwt from 'jsonwebtoken';
-import { getUserByUsername } from '../../../shared/services/AuthService'; // adjust import as needed
+    const { username, password } = req.body ?? {};
 
-const login: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+    if (!username || !password) {
+      context.res = {
+        status: 400,
+        body: { error: 'invalid_request', detail: 'username and password required', code: 400 },
+      };
+      return;
+    }
+
+    const authService = new AuthService();
+
+    // Using Resource Owner Password Credentials flow for prototype
+    const tokens = await authService.exchangeAuthCode(username, password, true);
+
+    context.res = {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: tokens,
+    };
+  } catch (err: any) {
+    if (err instanceof AuthError) {
+      context.res = {
+        status: err.code,
+        headers: { 'Content-Type': 'application/json' },
+        body: { error: 'auth_error', detail: err.message, code: err.code },
+      };
+    } else {
+      log.error('Unexpected error in login handler', err);
+      context.res = {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: { error: 'server_error', detail: 'Unexpected error', code: 500 },
+      };
+    }
+  }
+};
+
+/**
+ * Additional login implementation using getUserByUsername.
+ */
+export const login: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
   const { username, password } = req.body || {};
 
   // Basic validation (real implementation should verify password securely)
@@ -248,4 +297,4 @@ const login: AzureFunction = async (context: Context, req: HttpRequest): Promise
   };
 };
 
-export default login;
+export default loginPassword;

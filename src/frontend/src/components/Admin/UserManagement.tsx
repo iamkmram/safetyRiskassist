@@ -1,7 +1,10 @@
+/* eslint-disable */
+/* eslint-disable */
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { User } from '../../types'; // Adjust import based on your project alias
+import { User } from '../../types';
+import { Button } from '@fluentui/react-components';
 
 interface UserManagementProps {}
 
@@ -15,7 +18,7 @@ const UserManagement: React.FC<UserManagementProps> = () => {
       const resp = await axios.get<User[]>('/api/admin/users');
       setUsers(resp.data);
       setLoading(false);
-    } catch (err:any) {
+    } catch (err: any) {
       console.error('Failed to fetch users:', err);
       setError(err?.response?.data?.message ?? 'Unable to load users');
       setLoading(false);
@@ -34,6 +37,16 @@ const UserManagement: React.FC<UserManagementProps> = () => {
     } catch (err) {
       console.error('Deactivation failed:', err);
       alert('Failed to deactivate user.');
+    }
+  };
+
+  const refreshKnowledgeIndex = async () => {
+    try {
+      await axios.post('/api/v1/knowledge/reindex');
+      alert('Knowledge index refreshed successfully.');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to refresh knowledge index.');
     }
   };
 
@@ -74,33 +87,11 @@ const UserManagement: React.FC<UserManagementProps> = () => {
           ))}
         </tbody>
       </table>
+      <div className="mt-4">
+        <Button onClick={refreshKnowledgeIndex}>Refresh Knowledge Index</Button>
+      </div>
     </div>
   );
 };
 
 export default UserManagement;
-
-import React from 'react';
-import { Button } from '@fluentui/react-components';
-import axios from 'axios';
-
-const refreshKnowledgeIndex = async () => {
-  try {
-    await axios.post('/api/v1/knowledge/reindex');
-    alert('Knowledge index refreshed successfully.');
-  } catch (error) {
-    console.error(error);
-    alert('Failed to refresh knowledge index.');
-  }
-};
-
-export const UserManagement: React.FC = () => {
-  // Existing management UI ...
-
-  return (
-    <div>
-      {/* Existing UI elements */}
-      <Button onClick={refreshKnowledgeIndex}>Refresh Knowledge Index</Button>
-    </div>
-  );
-};
