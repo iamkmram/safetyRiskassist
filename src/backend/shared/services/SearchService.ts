@@ -1,26 +1,18 @@
-/**
- * Stub SearchService - always returns an empty result set.
- * Intended for UI development before the search backend is ready.
- */
-
-export interface SearchResult {
-  id: string;
-  title: string;
-  excerpt: string;
-  category: string;
-  updated_at: string;
-}
+import { DatabaseService } from "./DatabaseService";
+import { KnowledgeItem } from "../models/KnowledgeItem";
 
 /**
- * Perform a search across knowledge items.
- * @param query - freeform search string
- * @param category - optional category filter
- * @returns empty array of SearchResult
+ * SearchService - very simple fulltext search over the KnowledgeItem table.
+ * For the prototype we perform a LIKE query on the title field.
  */
-export async function searchKnowledge(
-  query: string,
-  category?: string
-): Promise<SearchResult[]> {
-  // Mock implementation - no data.
-  return [];
+export class SearchService {
+  static async search(query: string): Promise<KnowledgeItem[]> {
+    const sql = `
+      SELECT id, title, excerpt, category, content, updated_at
+      FROM knowledge_item
+      WHERE title LIKE ? OR content LIKE ?
+    `;
+    const param = `%${query}%`;
+    return DatabaseService.query<KnowledgeItem>(sql, [param, param]);
+  }
 }

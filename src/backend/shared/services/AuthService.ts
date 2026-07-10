@@ -1,57 +1,77 @@
-/**
- * Mock authentication service used by frontend and Azure Function stubs.
- * No real Azure AD integration - everything is deterministic.
- */
-
-import { AuthUser, MOCK_USERS } from "../models/User";
+import { DatabaseService } from "./DatabaseService";
+import { User } from "../models/User";
 
 /**
- * Returns a dummy login URL - in a real implementation this would be the Azure AD authorize endpoint.
+ * AuthService - encapsulates Azure AD login URL generation,
+ * token exchange, and a mock login helper for demo mode.
  */
-export function getMockLoginUrl(): string {
-  return "https://mock-login.dertour.local/authorize";
-}
+export class AuthService {
+  /**
+   * Returns the Azure AD authorization URL.
+   * In production the URL would be constructed from env vars.
+   */
+  static async getLoginUrl(): Promise<{ url: string }> {
+    // Mock URL - replace with real endpoint when integrating.
+    return { url: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=demo-client-id&response_type=code&redirect_uri=http://localhost:3000/auth/callback" };
+  }
 
-/**
- * Simulates authentication.
- * @param provider - name of the identity provider (e.g. "microsoft")
- * @param isGuest - true when user chooses "Continue as Guest"
- * @returns a promise that resolves with an object containing tokens and user data.
- */
-export async function mockAuthenticate(
-  provider: string,
-  isGuest: boolean
-): Promise<{
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  user: AuthUser | null;
-}> {
-  // Simple deterministic delay to emulate network latency.
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  /**
+   * Exchanges an OAuth authorization code for tokens and a user profile.
+   * This prototype returns a static payload.
+   */
+  static async exchangeCode(code: string): Promise<{
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+    user: Omit<User, "permissions">;
+  }> {
+    // In a real implementation you would POST to the Azure token endpoint.
+    // Here we simply simulate success if the code equals "demo-code".
+    if (code !== "demo-code") {
+      throw new Error("Invalid authorization code");
+    }
 
-  if (isGuest) {
-    // Guest token - no user payload.
+    const mockUser: User = {
+      id: "user-001",
+      name: "Sarah Chen",
+      email: "sarah.chen@dertour.com",
+      department: "Risk Assessment",
+      role: "Travel Advisor",
+      avatar: "/avatars/sarah.jpg",
+      last_login: "2026-07-08T14:30:00Z",
+      permissions: ["knowledge:read", "documents:view"],
+    };
+
     return {
-      access_token: "guest-access-token",
-      refresh_token: "guest-refresh-token",
+      access_token: "mock-access-token",
+      refresh_token: "mock-refresh-token",
       expires_in: 3600,
-      user: null
+      user: {
+        id: mockUser.id,
+        name: mockUser.name,
+        email: mockUser.email,
+        department: mockUser.department,
+        role: mockUser.role,
+        avatar: mockUser.avatar,
+        last_login: mockUser.last_login,
+      },
     };
   }
 
-  // Pick the first mock user for deterministic behaviour.
-  const user = MOCK_USERS[0];
-
-  // Basic dummy JWT payload - NOT signed.
-  const dummyPayload = Buffer.from(JSON.stringify({ sub: user.id })).toString(
-    "base64url"
-  );
-
-  return {
-    access_token: `mock-token-${dummyPayload}`,
-    refresh_token: `mock-refresh-${dummyPayload}`,
-    expires_in: 3600,
-    user
-  };
+  /**
+   * mockLogin - returns the first mock user (Sarah Chen) for demo mode.
+   * The frontend stores the result in localStorage.
+   */
+  static async mockLogin(): Promise<User> {
+    const rows = await DatabaseService.query<User>("SELECT * FROM auth_user WHERE id = ?", [
+      "user-001",
+    ]);
+    if (rows.length === 0) {
+      throw new Error("Mock user not found");
+    }
+    // permissions column is stored as JSON string
+    const user = rows[0];
+    user.permissions = JSON.parse((user as any).permissions);
+    return user;
+  }
 }
