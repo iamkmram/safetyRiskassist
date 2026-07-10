@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toCamel = exports.toSnake = exports.toCamelIdentity = exports.toSnakeIdentity = void 0;
+const toSnakeIdentity = (s) => s;
+exports.toSnakeIdentity = toSnakeIdentity;
+const toCamelIdentity = (s) => s;
+exports.toCamelIdentity = toCamelIdentity;
+const toSnake = (s) => s.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+exports.toSnake = toSnake;
+const toCamel = (s) => s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+exports.toCamel = toCamel;
