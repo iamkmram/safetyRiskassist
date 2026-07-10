@@ -43,7 +43,7 @@ export class DatabaseService {
   // ---------- SQLite ----------
   private static sqliteDbInstance: SQLiteDatabase | null = null;
 
-  private constructor(connectionString: string) {
+  public constructor(connectionString: string) {
     // Initialise Cosmos client
     this.client = new CosmosClient(connectionString);
     // Initialise PostgreSQL pool

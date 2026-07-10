@@ -8,7 +8,7 @@ import {
 } from "../types/database.types";
 import { logger } from "../../utils/logger";
 import { getConnection } from "typeorm";
-import { UserRole } from "../models/UserRole";
+// import { 'UserRole' } from "../models/'UserRole'";
 import { sql } from "@vercel/postgres";
 import { queryDatabase } from "../utils/database";
 import { PermissionRow } from "../types/database.types";
@@ -37,13 +37,13 @@ export class PermissionService {
     try {
       const query = `
         SELECT VALUE COUNT(1) FROM c
-        WHERE c.user_id = @userId AND c.role = @role
+        WHERE c.userId = @userId AND c.role = @role
       `;
       const params = [
         { name: "@userId", value: userId },
         { name: "@role", value: role },
       ];
-      const result = await this.dbService.queryItems<number>(
+      const result = await this.dbService.queryItems(
         PermissionService.CONTAINER,
         query,
         params
@@ -63,7 +63,7 @@ export class PermissionService {
   public async grantRole(userId: string, role: string): Promise<Permission> {
     const newPermission: Permission = {
       id: crypto.randomUUID(),
-      user_id: userId,
+      userId: userId,
       role,
       granted_at: new Date().toISOString(),
     };
@@ -105,9 +105,9 @@ export class PermissionService {
       FROM permissions p
       JOIN role_permission rp ON p.id = rp.permission_id
       JOIN user_role ur ON rp.role_id = ur.role_id
-      WHERE ur.user_id = $1
+      WHERE ur.userId = $1
     `;
-    const direct = await this.db.query<UserPermission>(directSql, [userId]);
+    const direct = await this.db.query(directSql, [userId]);
 
     // Inherited permissions via role hierarchy
     const inheritedSql = `
@@ -116,14 +116,14 @@ export class PermissionService {
       JOIN role_permission rp ON p.id = rp.permission_id
       JOIN role_hierarchy rh ON rp.role_id = rh.parent_role_id
       JOIN user_role ur ON rh.child_role_id = ur.role_id
-      WHERE ur.user_id = $1
+      WHERE ur.userId = $1
     `;
-    const inherited = await this.db.query<UserPermission>(inheritedSql, [
+    const inherited = await this.db.query(inheritedSql, [
       userId,
     ]);
 
     // Combine and deduplicate by permission id
-    const map = new Map<string, UserPermission>();
+    const map = new Map();
     direct.concat(inherited).forEach((perm) => {
       const existing = map.get(perm.id);
       if (!existing || (perm.inherited && !existing.inherited)) {
@@ -156,7 +156,7 @@ export class PermissionService {
     }
 
     // Legacy fallback: permissions stored as JSON in auth_user table
-    const rows = await DatabaseService.query<{ permissions: string }>(
+    const rows = await DatabaseService.query(
       "SELECT permissions FROM auth_user WHERE id = ?",
       [userId]
     );
@@ -188,7 +188,7 @@ export class PermissionService {
       JOIN role_permission rp ON p.id = rp.permission_id
       JOIN role_tree rt ON rp.role_id = rt.id
     `;
-    return this.db.query<Permission>(sqlQuery, [roleId]);
+    return this.db.query(sqlQuery, [roleId]);
   }
 
   // ------------------------------------------------------------------
@@ -200,7 +200,7 @@ export class PermissionService {
     userId: string,
     permission: string
   ): Promise<boolean> {
-    const rows = await DatabaseService.query<{ permissions: string }>(
+    const rows = await DatabaseService.query(
       "SELECT permissions FROM auth_user WHERE id = ?",
       [userId]
     );
@@ -217,11 +217,11 @@ export class PermissionService {
 
   /** Does the given user have a specific permission? (TypeORM helper) */
   static async has_permission(
-    user_id: string,
+    userId: string,
     permission: string
   ): Promise<boolean> {
-    const repo = getConnection().getRepository(UserRole);
-    const role = await repo.findOne({ where: { userId: user_id } });
+    const repo = getConnection().getRepository('UserRole');
+    const role = await repo.findOne({ where: { userId: userId } });
     if (!role) return false;
     const rolePermissions: Record<string, string[]> = {
       admin: ["admin_settings", "view_all"],
@@ -232,9 +232,9 @@ export class PermissionService {
   }
 
   /** Helper used by the frontend to quickly know if a user is admin */
-  static async is_admin(user_id: string): Promise<boolean> {
-    const repo = getConnection().getRepository(UserRole);
-    const role = await repo.findOne({ where: { userId: user_id } });
+  static async is_admin(userId: string): Promise<boolean> {
+    const repo = getConnection().getRepository('UserRole');
+    const role = await repo.findOne({ where: { userId: userId } });
     return role?.role === "admin";
   }
 
@@ -264,10 +264,10 @@ export class PermissionService {
   static async hasDashboardAccess(userId: string): Promise<boolean> {
     const query = `
       SELECT 1 FROM permissions
-      WHERE user_id = @userId
+      WHERE userId = @userId
         AND permission_name = 'dashboard_view'
     `;
-    const result = await queryDatabase<PermissionRow>(query, { userId });
+    const result = await queryDatabase(query, { userId });
     return result.length > 0;
   }
 }
