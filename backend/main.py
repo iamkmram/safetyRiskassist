@@ -54,3 +54,19 @@ async def health_check():
 
 # Include the API router under the versioned prefix
 app.include_router(api_router, prefix="/api/v1")
+
+# ----------------------------------------------------------------------
+# Middleware registration (added by automation)
+# ----------------------------------------------------------------------
+from backend.shared.middleware.cors.middleware import create_cors_middleware
+from backend.shared.middleware.rate_limit.middleware import create_rate_limit_middleware
+from backend.shared.middleware.validation.middleware import create_validation_middleware
+from backend.shared.middleware.audit.middleware import create_audit_middleware
+from backend.shared.middleware.error_handler.middleware import register_global_error_handler
+
+# Assuming the FastAPI instance is named `app` in this module.
+create_cors_middleware(app)
+create_rate_limit_middleware(app)
+create_validation_middleware(app)
+create_audit_middleware(app)
+register_global_error_handler(app)
