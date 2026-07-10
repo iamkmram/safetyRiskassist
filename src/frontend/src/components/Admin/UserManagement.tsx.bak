@@ -1,14 +1,10 @@
 import React from "react";
-import { AuthUser } from "../../types/auth.types";
-import { MOCK_USERS } from "../../utils/mockDataExports";
-
-export const Placeholder = () => {
-  return <div>Placeholder component for ${__dirname}</div>;
-};
+// import { PermissionService } from "../../../backend/shared/services/PermissionService";
+// import { toast } from "../../components/Common/Toast";
 
 /**
  * Simple admin table that lists the three mock users.
- * The Delete button calls a placeholder PermissionService method.
+//  * The Delete button calls a placeholder PermissionService method.
  */
 interface MockUser {
   id: string;
@@ -49,12 +45,11 @@ const mockUsers: MockUser[] = [
 export const UserManagement: React.FC = () => {
   const handleDelete = async (userId: string) => {
     // Placeholder call - in a real app this would invoke an API endpoint.
-    // const hasPermission = await PermissionService.hasPermission(userId, "admin:delete_user");
-    const hasPermission = true;
-    if (hasPermission) {
-      // toast.success(`User ${userId} would be deleted (mock)`);
+//     const allowed = await PermissionService.hasPermission(userId, "admin:delete_user");
+    if (allowed) {
+      toast.success(`User ${userId} would be deleted (mock)`);
     } else {
-      // toast.error("You do not have permission to delete users");
+      toast.error("You do not have permission to delete users");
     }
   };
 
@@ -98,4 +93,4 @@ export const UserManagement: React.FC = () => {
   );
 };
 
-export default Placeholder;
+export default UserManagement;
