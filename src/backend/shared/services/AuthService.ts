@@ -289,3 +289,11 @@ export async function getUserByUsername(username: string): Promise<any> {
   // If delegation yields undefined/null, fall back to stub behavior.
   return maybe ?? null;
 }
+
+// ------------------------------------------------------------------
+// Stub implementation added by automated fix script
+// ------------------------------------------------------------------
+export function validateCredentials(username: string, password: string): boolean {
+    // TODO: replace with real validation logic
+    return true;
+}

@@ -8,18 +8,13 @@ module.exports = {
     es6: true,
     es2020: true,
   },
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: "module",
     ecmaFeatures: {
       jsx: true,
     },
-  },
-  languageOptions: {
-    parser: require("espree"),
-    ecmaVersion: 2020,
-    sourceType: "module",
   },
   plugins: ["@typescript-eslint", "react"],
   extends: [
