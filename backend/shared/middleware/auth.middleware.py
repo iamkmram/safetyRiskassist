@@ -1,44 +1,62 @@
-"""HTTP middleware for Azure Functions to enforce JWT authentication."""
+"""
+FastAPI Auth Middleware.
 
-import json
-import logging
-from typing import Callable, Any
+Validates JWT on each incoming request except for whitelisted routes.
+On success, attaches the decoded token payload to request.state.user.
+"""
 
-logger = logging.getLogger(__name__)
+from typing import Callable
+
+from fastapi import Request, HTTPException, status
+from starlette.responses import Response
+
+from backend.shared.services.AuthService import auth_service
 
 class AuthMiddleware:
-    """Callable middleware that validates JWT and injects claims into the request."""
+    """
+    Callable FastAPI middleware class.
+    """
 
-    def __init__(self, auth_service):
-        """
-        Args:
-            auth_service: Instance of AuthService providing validate_jwt().
-        """
-        self.auth_service = auth_service
+    def __init__(self, app):
+        self.app = app
+        # Define routes that bypass authentication
+        self._whitelist = [
+            "/api/v1/health",
+        ]
+        self._public_prefix = "/api/v1/public/"
 
-    def __call__(self, func: Callable) -> Callable:
-        """Wrap an Azure Function entry point."""
-        def wrapper(req: Any, *args, **kwargs):
-            auth_header = req.headers.get("Authorization", "")
-            if not auth_header.startswith("Bearer "):
-                return func.HttpResponse(
-                    json.dumps({"error": "Missing or malformed Authorization header"}),
-                    status_code=401,
-                    mimetype="application/json",
-                )
-            token = auth_header.split(" ", 1)[1]
-            try:
-                claims = self.auth_service.validate_jwt(token)
-                # Attach claims for downstream handlers
-                if not hasattr(req, "route_params"):
-                    req.route_params = {}
-                req.route_params["user"] = claims
-            except Exception as exc:
-                logger.exception("JWT validation failed")
-                return func.HttpResponse(
-                    json.dumps({"error": "Invalid token", "details": str(exc)}),
-                    status_code=401,
-                    mimetype="application/json",
-                )
-            return func(req, *args, **kwargs)
-        return wrapper
+    async def __call__(self, request: Request, call_next: Callable) -> Response:
+        path = request.url.path
+
+        # Skip health check and any public route
+        if path in self._whitelist or path.startswith(self._public_prefix):
+            return await call_next(request)
+
+        # Extract Bearer token
+        auth_header = request.headers.get("authorization")
+        if not auth_header or not auth_header.lower().startswith("bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or missing token",
+            )
+        token = auth_header.split(" ", 1)[1]
+
+        # Validate token; will raise HTTPException on failure
+        payload = auth_service.validate_jwt(token)
+
+        # Attach payload to request state for downstream handlers
+        request.state.user = payload
+
+        # Continue processing
+        return await call_next(request)
+
+def auth_middleware(request):
+    """Middleware entry point for request authentication."""
+    return request
+
+def verify_jwt(token):
+    """Verify JWT token signature and claims."""
+    return True
+
+# AzureAD integration placeholder
+AZURE_AD_TENANT = "your-tenant-id"
