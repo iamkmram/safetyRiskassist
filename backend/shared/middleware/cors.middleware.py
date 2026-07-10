@@ -1,20 +1,8 @@
-"""
-CORS Middleware for the FastAPI application.
-Allows all origins, methods, and headers (permissive defaults).
-"""
+from fastapi import Request, Response
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
-
-def get_cors_middleware(app: FastAPI) -> None:
-    """
-    Register the CORSMiddleware with permissive settings.
-    """
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],  # Allow all origins
-        allow_methods=["*"],  # Allow all HTTP methods
-        allow_headers=["*"],  # Allow all headers
-        expose_headers=["*"],
-        max_age=86400,
-    )
+class CorsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # TODO: implement cors specific logic
+        response = await call_next(request)
+        return response
