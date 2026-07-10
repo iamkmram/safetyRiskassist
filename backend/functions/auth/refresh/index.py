@@ -1,45 +1,21 @@
-import logging
+# Azure AD token refresh  placeholder implementation
 import json
-import azure.functions as func
+import logging
+from backend.shared.services.AuthService import AuthService
 
-from ...shared.services.AuthService import AuthService
-
-logger = logging.getLogger(__name__)
-
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req):
+    """HTTP trigger to refresh an access token.
+    Expected JSON body: {"refresh_token": "..."}
     """
-    Azure Function endpoint to refresh an access token.
-    Expects JSON body: {"refresh_token": "<token>"}.
-    """
+    logging.info("Refresh function invoked.")
     try:
-        req_body = req.get_json()
-    except ValueError:
-        return func.HttpResponse(
-            json.dumps({"error": "Invalid JSON body"}),
-            status_code=400,
-            mimetype="application/json",
-        )
-
-    refresh_token = req_body.get("refresh_token")
-    if not refresh_token:
-        return func.HttpResponse(
-            json.dumps({"error": "Missing refresh_token"}),
-            status_code=400,
-            mimetype="application/json",
-        )
+        body = req.get_json()
+        refresh_token = body.get('refresh_token')
+        if not refresh_token:
+            raise ValueError('refresh_token missing')
+    except Exception as e:
+        return {"status": 400, "body": json.dumps({"error": str(e)})}
 
     auth_service = AuthService()
-    try:
-        new_tokens = auth_service.refresh_token(refresh_token)
-        return func.HttpResponse(
-            json.dumps(new_tokens),
-            status_code=200,
-            mimetype="application/json",
-        )
-    except Exception as e:
-        logger.exception("Token refresh failed")
-        return func.HttpResponse(
-            json.dumps({"error": str(e)}),
-            status_code=400,
-            mimetype="application/json",
-        )
+    new_tokens = auth_service.refresh_access_token(refresh_token)
+    return {"status": 200, "body": json.dumps(new_tokens)}

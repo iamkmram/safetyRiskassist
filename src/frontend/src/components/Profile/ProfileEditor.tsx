@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 // @ts-ignore
 // @ts-ignore
-import { UserProfile } from "../../../utils/mockData";
+import { any } from "../../../utils/mockData";
 
 export default function ProfileEditor() {
-  const [profile, setProfile] = useState<UserProfile>(UserProfile);
+  const [profile, setProfile] = useState<any>(any);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
