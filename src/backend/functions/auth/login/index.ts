@@ -1,31 +1,32 @@
 import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { AuthService } from '../../../shared/services/AuthService';
+import AuthService from '../../../shared/services/AuthService';
+import { HttpResponse } from '@azure/functions';
 
-const loginFunction: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+const httpTrigger: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
   try {
     const { username, password } = req.body || {};
 
     if (!username || !password) {
       context.res = {
         status: 400,
-        body: { error: 'InvalidRequest', detail: 'username and password required', code: 400 },
+        body: { error: 'Missing credentials', details: null },
       };
       return;
     }
 
-    const tokens = await AuthService.authenticate(username, password);
+    const tokens = await AuthService.login(username, password);
     context.res = {
       status: 200,
       body: tokens,
     };
   } catch (err: any) {
-    context.log('Login error:', err);
-    const status = err.status || 500;
+    const status = err.statusCode ?? 500;
+    const message = err.message ?? 'Internal server error';
     context.res = {
       status,
-      body: { error: err.name || 'ServerError', detail: err.message, code: status },
+      body: { error: message, details: err.details || null },
     };
   }
 };
 
-export default loginFunction;
+export default httpTrigger;

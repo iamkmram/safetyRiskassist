@@ -1,74 +1,25 @@
-export interface Department {
-  id: number;
-  name: string;
-}
+/**
+ * Types used across the backend for databaserelated operations.
+ */
 
-export interface Role {
-  id: number;
-  name: string;
-}
-
-export interface Permission {
-  id: number;
-  name: string;
-  description?: string;
-}
-
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  departmentId?: number;
-  isActive: boolean;
-  createdAt: Date;
-  roles?: Role[];
-}
-
-export interface Conversation {
-  id: number;
-  userId?: number;
-  startedAt: Date;
-}
-
-export interface Message {
-  id: number;
-  conversationId: number;
-  sender: string;
-  content: string;
-  createdAt: Date;
-}
-
-export interface KnowledgeItem {
-  id: number;
-  title: string;
-  content: string;
-  createdAt: Date;
-}
-
-export interface Document {
-  id: number;
-  fileName: string;
-  mimeType?: string;
-  storagePath: string;
-  uploadedBy?: number;
-  uploadedAt: Date;
-}
-
-export interface AuditLog {
-  id: number;
-  userId?: number;
-  action: string;
-  resourceType?: string;
-  resourceId?: number;
-  timestamp: Date;
-  details?: any;
-}
-
-export interface DBConfig {
+export interface DatabaseConfig {
   host: string;
-  port: number;
+  port: string;
   database: string;
   user: string;
   password: string;
-  ssl: boolean;
+  ssl: string; // "true" | "false"
+}
+
+/** Payload for permission evaluation */
+export interface PermissionCheckRequest {
+  subjectId: string;   // UUID of user
+  resource: string;   // e.g. "knowledge"
+  action: string;      // e.g. "read"
+}
+
+/** Result returned by PermissionService */
+export interface PermissionCheckResult {
+  allowed: boolean;
+  reason?: string;
 }

@@ -1,46 +1,55 @@
-import { Pool, QueryResult } from 'pg';
-import { DBConfig } from '../types/database.types';
+/**
+ * DatabaseService - a lightweight wrapper around the PostgreSQL client.
+ * It reads connection parameters from environment variables and provides
+ * a singleton pool for the rest of the backend.
+ */
 
-export class DatabaseService {
+import { Pool, PoolConfig } from 'pg';
+import { DatabaseConfig } from '../types/database.types';
+
+class DatabaseService {
   private static instance: DatabaseService;
-  private pool: Pool;
+  public pool: Pool;
 
-  private constructor(config: DBConfig) {
-    this.pool = new Pool({
+  private constructor(config: DatabaseConfig) {
+    const poolConfig: PoolConfig = {
       host: config.host,
-      port: config.port,
+      port: Number(config.port),
       database: config.database,
       user: config.user,
       password: config.password,
-      ssl: config.ssl,
-    });
+      ssl: config.ssl === 'true',
+      max: 20,
+      idleTimeoutMillis: 30000,
+    };
+    this.pool = new Pool(poolConfig);
   }
 
   public static getInstance(): DatabaseService {
     if (!DatabaseService.instance) {
-      const config: DBConfig = {
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '5432', 10),
-        database: process.env.DB_NAME || 'appdb',
-        user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD || '',
-        ssl: process.env.DB_SSL === 'true',
+      const cfg: DatabaseConfig = {
+        host: process.env.PGHOST || 'localhost',
+        port: process.env.PGPORT || '5432',
+        database: process.env.PGDATABASE || 'knowledge',
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || '',
+        ssl: process.env.PGSSL || 'false',
       };
-      DatabaseService.instance = new DatabaseService(config);
+      DatabaseService.instance = new DatabaseService(cfg);
     }
     return DatabaseService.instance;
   }
 
-  public async query<T>(text: string, params?: any[]): Promise<QueryResult<T>> {
+  /** Simple query helper that returns rows typed as <T> */
+  public async query<T>(text: string, params?: any[]): Promise<T[]> {
     const client = await this.pool.connect();
     try {
-      return await client.query<T>(text, params);
+      const res = await client.query<T>(text, params);
+      return res.rows;
     } finally {
       client.release();
     }
   }
-
-  public async close(): Promise<void> {
-    await this.pool.end();
-  }
 }
+
+export default DatabaseService.getInstance();

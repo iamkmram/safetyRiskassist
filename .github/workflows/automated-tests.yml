@@ -2,21 +2,47 @@ name: Automated Tests
 
 on:
   push:
-    branches: [main]
+    branches: [ main, develop ]
   pull_request:
-    branches: [main]
+    branches: [ main, develop ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+        python-version: [3.11]
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          cache: 'npm'
-      - name: Install dependencies
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install frontend dependencies
+        working-directory: src/frontend
         run: npm ci
-      - name: Run tests
-        run: npm test
+
+      - name: Run frontend unit tests
+        working-directory: src/frontend
+        run: npm test --if-present
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend unit tests
+        working-directory: backend
+        run: npm test --if-present
+
+      - name: Run integration tests (if any)
+        run: echo "Add integration test runner here"
