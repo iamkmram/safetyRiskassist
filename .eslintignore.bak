@@ -1,0 +1,8 @@
+# Ignore JavaScript files that are written with JSX syntax
+src/frontend/**/*.js
+src/frontend/**/*.jsx
+src/frontend/src/components/**/*.js
+src/frontend/**/*.ts
+src/frontend/**/*.tsx
+# Ignore all frontend source files  they are not part of this sprint's backend work
+src/frontend/**

@@ -1,0 +1,1 @@
+src/frontend/src/components/Dashboard/DashboardPage.tsx(44,75): error TS2339: Property 'recentConversations' does not exist on type '{ totalQueries: number; weeklyQueries: number; topTopics: string[]; activeAlerts: number; }'.
