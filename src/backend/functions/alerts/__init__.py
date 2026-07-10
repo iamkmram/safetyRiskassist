@@ -5,6 +5,9 @@ Provides helper to publish alert messages to a queue or topic.
 All functions within this package should import `publish_alert` from here.
 """
 
+# Legacy placeholder from previous version:
+# Alerts function package - placeholder for broadcast/create alert functions.
+
 import json
 import logging
 import os
