@@ -1,49 +1,30 @@
-/**
- * setup-cosmos.js
- *
- * Provision a Cosmos DB account, database and containers if they do not exist.
- * Designed to be idempotent and heavily logged.
- *
- * Usage: node setup-cosmos.js
- */
+// setup-cosmos.js
+// Creates the Cosmos DB database and a container for knowledge items.
 
-const { CosmosClient } = require('@azure/cosmos');
-const winston = require('winston');
+const { CosmosClient } = require("@azure/cosmos");
+require("dotenv").config();
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.printf(info => `[${info.timestamp}] ${info.level.toUpperCase()} ${info.message}`)
-  ),
-  transports: [new winston.transports.Console()],
-});
+const endpoint = process.env.COSMOS_ENDPOINT;
+const key = process.env.COSMOS_KEY;
+const databaseId = process.env.COSMOS_DB_ID || "knowledgeDb";
+const containerId = process.env.COSMOS_CONTAINER_ID || "knowledgeItems";
 
 async function main() {
-  const connectionString = process.env.COSMOS_CONNECTION_STRING;
-  if (!connectionString) {
-    logger.error('COSMOS_CONNECTION_STRING environment variable is missing.');
-    process.exit(1);
-  }
+  const client = new CosmosClient({ endpoint, key });
 
-  const client = new CosmosClient(connectionString);
-  const dbId = process.env.COSMOS_DB_NAME || 'travel-assistant-db';
+  const { database } = await client.databases.createIfNotExists({
+    id: databaseId,
+  });
+  console.log(` Cosmos DB database "${database.id}" is ready.`);
 
-  try {
-    const { database } = await client.databases.createIfNotExists({ id: dbId });
-    logger.info(`Database '${dbId}' ensured.`);
-
-    const containers = ['users', 'permissions', 'documents'];
-    for (const cont of containers) {
-      const { container } = await database.containers.createIfNotExists({ id: cont });
-      logger.info(`Container '${cont}' ensured.`);
-    }
-
-    logger.info('Cosmos DB setup completed successfully.');
-  } catch (err) {
-    logger.error(`Cosmos DB setup failed: ${err.message}`);
-    process.exit(1);
-  }
+  const { container } = await database.containers.createIfNotExists({
+    id: containerId,
+    partitionKey: { paths: ["/id"] },
+  });
+  console.log(` Container "${container.id}" is ready.`);
 }
 
-main();
+main().catch((err) => {
+  console.error(" Error setting up Cosmos DB:", err);
+  process.exit(1);
+});

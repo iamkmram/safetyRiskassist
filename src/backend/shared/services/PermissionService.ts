@@ -107,3 +107,25 @@ export class PermissionService {
     return role?.role === "admin";
   }
 }
+
+import { sql } from '@vercel/postgres';
+
+export class PermissionService {
+  // Existing methods may already be present ...
+
+  /**
+   * Checks whether a user has a specific permission.
+   * Returns true if a matching row exists in the permissions table.
+   */
+  static async hasAccess(userId: string, resource: string, action: string): Promise<boolean> {
+    const result = await sql`
+      SELECT 1
+      FROM permissions p
+      JOIN users u ON u.role = p.role
+      WHERE u.id = ${userId}
+        AND p.resource = ${resource}
+        AND p.action = ${action}
+      LIMIT 1`;
+    return result.length > 0;
+  }
+}

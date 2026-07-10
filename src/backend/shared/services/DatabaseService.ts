@@ -244,3 +244,73 @@ export async function fetchAll<T>(tableName: string): Promise<T[]> {
 export async function insertOne<T>(tableName: string, record: T): Promise<void> {
   return;
 }
+
+import { KnowledgeItem } from '../models/KnowledgeItem';
+import { PermissionService } from './PermissionService';
+import { sql } from '@vercel/postgres'; // adjust import according to actual DB client
+
+// Helper to generate UUIDs - replace with actual utility if present
+function generateUuid(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0;
+    const v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+/**
+ * Extended Knowledgespecific database actions.
+ */
+export class KnowledgeDatabaseService extends DatabaseService {
+  async createKnowledgeItem(
+    item: Omit<KnowledgeItem, 'id' | 'createdAt' | 'updatedAt'>,
+    userId: string
+  ): Promise<KnowledgeItem> {
+    const allowed = await PermissionService.hasAccess(userId, 'knowledge_items', 'create');
+    if (!allowed) throw new Error('Access denied');
+
+    const id = generateUuid();
+    const now = new Date();
+
+    const result = await sql`
+      INSERT INTO knowledge_items (id, title, content, created_at, updated_at)
+      VALUES (${id}, ${item.title}, ${item.content}, ${now}, ${now})
+      RETURNING *`;
+    return result[0] as KnowledgeItem;
+  }
+
+  async getKnowledgeItemById(id: string, userId: string): Promise<KnowledgeItem | null> {
+    const allowed = await PermissionService.hasAccess(userId, 'knowledge_items', 'read');
+    if (!allowed) throw new Error('Access denied');
+
+    const result = await sql`SELECT * FROM knowledge_items WHERE id = ${id}`;
+    return result.length ? (result[0] as KnowledgeItem) : null;
+  }
+
+  async updateKnowledgeItem(
+    id: string,
+    updates: Partial<Omit<KnowledgeItem, 'id' | 'createdAt' | 'updatedAt'>>,
+    userId: string
+  ): Promise<KnowledgeItem> {
+    const allowed = await PermissionService.hasAccess(userId, 'knowledge_items', 'update');
+    if (!allowed) throw new Error('Access denied');
+
+    const now = new Date();
+
+    const result = await sql`
+      UPDATE knowledge_items
+      SET title = COALESCE(${updates.title}, title),
+          content = COALESCE(${updates.content}, content),
+          updated_at = ${now}
+      WHERE id = ${id}
+      RETURNING *`;
+    return result[0] as KnowledgeItem;
+  }
+
+  async deleteKnowledgeItem(id: string, userId: string): Promise<void> {
+    const allowed = await PermissionService.hasAccess(userId, 'knowledge_items', 'delete');
+    if (!allowed) throw new Error('Access denied');
+
+    await sql`DELETE FROM knowledge_items WHERE id = ${id}`;
+  }
+}

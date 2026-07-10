@@ -86,3 +86,19 @@ export interface ActivitySummary {
   documents_viewed: number;
   last_login: string;
 }
+
+export interface KnowledgeItem {
+  id: string;
+  title: string;
+  content: string;
+  vectorEmbedding?: number[];
+  createdAt: string; // ISO8601
+  updatedAt: string;
+}
+
+export interface Permission {
+  id: string;
+  role: string;
+  resource: string;
+  action: string;
+}
