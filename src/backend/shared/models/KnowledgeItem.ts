@@ -1,28 +1,49 @@
+import { Document } from '../types/database.types';
+
 /**
- * KnowledgeItem model - combines fields from multiple versions.
- * Includes legacy and new identifiers, content details, and metadata.
+ * Simple wrapper class for KnowledgeItem (aka Document).
+ * Provides utility methods for summarising content.
  */
-export interface KnowledgeItem {
-  /** Legacy identifier (used in older code) */
+export class KnowledgeItem implements Document {
   id: string;
-  /** Current article identifier (used in newer authentication flow) */
-  article_id: string;
-  /** Title of the knowledge article */
   title: string;
-  /** Short excerpt of the article (legacy) */
-  excerpt: string;
-  /** Full content of the article */
   content: string;
-  /** Category of the article */
-  category: string;
-  /** Creation timestamp (ISO8601) */
+  author_id: string;
   created_at: string;
-  /** Last updated timestamp (ISO8601) */
   updated_at: string;
-  /** Indicates if the article is popular */
-  is_popular: boolean;
-  /** Publication status of the article */
-  is_published: boolean;
-  /** Number of times the article has been viewed */
-  view_count: number;
+
+  constructor(doc: Document) {
+    this.id = doc.id;
+    this.title = doc.title;
+    this.content = doc.content;
+    this.author_id = doc.author_id;
+    this.created_at = doc.created_at;
+    this.updated_at = doc.updated_at;
+  }
+
+  /** Return first N characters of content for preview */
+  preview(chars: number = 150): string {
+    if (this.content.length <= chars) return this.content;
+    return this.content.substring(0, chars) + '...';
+  }
+
+  /** Basic keyword extraction - naive implementation */
+  keywords(): string[] {
+    const words = this.content
+      .toLowerCase()
+      .replace(/[^a-z0-9\\s]/g, '')
+      .split(/\\s+/);
+    const stopWords = new Set(['the', 'and', 'of', 'to', 'a', 'in', 'for', 'on', 'with']);
+    const freq: Record<string, number> = {};
+    for (const w of words) {
+      if (!stopWords.has(w) && w.length > 2) {
+        freq[w] = (freq[w] ?? 0) + 1;
+      }
+    }
+    // Return top 5 frequent words
+    return Object.entries(freq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([word]) => word);
+  }
 }

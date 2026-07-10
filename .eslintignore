@@ -1,1 +1,1 @@
-src/backend/**
+!src/frontend/src/components/Dashboard/**/*.tsx
