@@ -1,0 +1,14 @@
+
+  secret-scanning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Secret Scanning
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: secret-scanning
+          # Explicitly include Azure Search connection strings
+          config: |
+            secrets:
+              - AZURE_SEARCH_CONNECTION_STRING
+              - AZURE_SEARCH_ADMIN_KEY
