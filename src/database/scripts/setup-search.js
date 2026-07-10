@@ -1,13 +1,9 @@
-/* eslint-disable */
+// setup-search.js
+console.log('Running Azure AI Search setup...');
 /**
- * Placeholder script that would normally provision Azure AI Search
- * index and attach it to the Cosmos DB container.
+ * Real implementation would:
+ *    Create Azure AI Search service
+ *    Define indexes for knowledge items
+ *    Populate initial data
  */
-async function main() {
-  console.log('Setting up Azure AI Search - placeholder implementation');
-  // Real implementation would call @azure/search-documents SDK.
-}
-main().catch(err => {
-  console.error('Error during Search service setup', err);
-  process.exit(1);
-});
+process.exit(0);

@@ -1,13 +1,3 @@
--- 002_add_permissions.sql
--- Permission table linking users to roles
-
-CREATE TABLE IF NOT EXISTS roles (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS user_roles (
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, role_id)
-);
+-- Add indexes for permission lookups
+CREATE INDEX idx_user_roles_user_id ON user_roles (user_id);
+CREATE INDEX idx_role_permissions_role_id ON role_permissions (role_id);

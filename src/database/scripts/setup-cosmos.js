@@ -1,13 +1,9 @@
-/* eslint-disable */
+// setup-cosmos.js
+console.log('Running Cosmos DB setup...');
 /**
- * Placeholder script that would normally provision Azure Cosmos DB
- * and create necessary containers/collections.
+ * Real implementation would:
+ *    Create Azure Cosmos DB account
+ *    Provision databases & containers
+ *    Apply indexing policies
  */
-async function main() {
-  console.log('Setting up Cosmos DB - placeholder implementation');
-  // In real life you would use @azure/cosmos SDK here.
-}
-main().catch(err => {
-  console.error('Error during Cosmos DB setup', err);
-  process.exit(1);
-});
+process.exit(0);

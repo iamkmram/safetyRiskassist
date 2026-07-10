@@ -1,56 +1,74 @@
-/* eslint-disable */
-// ------------------------------------------------------------------
-// Database type definitions
-// ------------------------------------------------------------------
-
-export interface Permission {
-  id: string;
-  key: string;
-  description?: string;
-  // Optional resource scope (e.g., department, document)
-  resource_id?: string;
+export interface Department {
+  id: number;
+  name: string;
 }
 
 export interface Role {
-  id: string;
+  id: number;
+  name: string;
+}
+
+export interface Permission {
+  id: number;
   name: string;
   description?: string;
 }
 
-export interface Department {
-  id: string;
-  name: string;
-}
-
-/** Types representing rows returned from raw SQL queries */
-export interface PermissionRow {
-  user_id: string;
-  permission_name: string;
-}
-
-/** Shape of the data returned by the dashboard metrics endpoint */
-export interface DashboardMetrics {
-  totalQueriesThisWeek: number;
-  mostSearchedTopics: string[];
-  recentConversations: {
-    id: string;
-    snippet: string;
-    timestamp: string;
-  }[];
-  trendingTravelAlerts: number;
-}
-
-/* Existing type definitions can be retained below */
-
-export interface UserPermission extends Permission {
-  // Helper flag to indicate inherited permissions
-  inherited?: boolean;
-}
-
-/**
- * Placeholder User interface added to satisfy missing export errors.
- * Real implementation should replace this with the actual shape of a User.
- */
 export interface User {
-  [key: string]: any;
+  id: number;
+  username: string;
+  email: string;
+  departmentId?: number;
+  isActive: boolean;
+  createdAt: Date;
+  roles?: Role[];
+}
+
+export interface Conversation {
+  id: number;
+  userId?: number;
+  startedAt: Date;
+}
+
+export interface Message {
+  id: number;
+  conversationId: number;
+  sender: string;
+  content: string;
+  createdAt: Date;
+}
+
+export interface KnowledgeItem {
+  id: number;
+  title: string;
+  content: string;
+  createdAt: Date;
+}
+
+export interface Document {
+  id: number;
+  fileName: string;
+  mimeType?: string;
+  storagePath: string;
+  uploadedBy?: number;
+  uploadedAt: Date;
+}
+
+export interface AuditLog {
+  id: number;
+  userId?: number;
+  action: string;
+  resourceType?: string;
+  resourceId?: number;
+  timestamp: Date;
+  details?: any;
+}
+
+export interface DBConfig {
+  host: string;
+  port: number;
+  database: string;
+  user: string;
+  password: string;
+  ssl: boolean;
 }
