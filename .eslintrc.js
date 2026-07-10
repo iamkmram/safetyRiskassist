@@ -1,4 +1,6 @@
 module.exports = {
+  ignorePatterns: ['src/frontend/**', "src/frontend/src/**"],
+
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,

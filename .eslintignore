@@ -4,3 +4,4 @@ src/frontend/**/*.jsx
 src/frontend/src/components/**/*.js
 src/frontend/**/*.ts
 src/frontend/**/*.tsx
+src/frontend/**
