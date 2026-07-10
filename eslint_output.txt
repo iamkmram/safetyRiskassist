@@ -1,125 +1,18 @@
-(node:2818) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignore-files
-(Use `node --trace-warnings ...` to show where the warning was created)
 
-/workspace/backend/shared/services/AuthService.ts
-  7:30  error  Parsing error: Unexpected token :
+Oops! Something went wrong! :(
 
-/workspace/src/frontend/src/components/Admin/ContentManagement.js
-  10:12  error  Parsing error: Unexpected token <
+ESLint: 10.6.0
 
-/workspace/src/frontend/src/components/Admin/ContentManagement.tsx
-  8:10  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Admin/UserManagement.js
-  8:10  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Admin/UserManagement.tsx
-  9:1  error  Parsing error: The keyword 'interface' is reserved
-
-/workspace/src/frontend/src/components/Auth/AuthGuard.js
-  25:12  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Auth/AuthGuard.tsx
-  13:1  error  Parsing error: The keyword 'interface' is reserved
-
-/workspace/src/frontend/src/components/Auth/LoginForm.js
-  14:12  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Auth/LoginForm.tsx
-  6:1  error  Parsing error: The keyword 'interface' is reserved
-
-/workspace/src/frontend/src/components/Auth/UserProfile.js
-  145:16  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Auth/UserProfile.tsx
-  29:1  error  Parsing error: The keyword 'interface' is reserved
-
-/workspace/src/frontend/src/components/Common/Layout.tsx
-  3:6  error  Parsing error: Unexpected token LayoutProps
-
-/workspace/src/frontend/src/components/Common/Navigation.tsx
-  3:24  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Dashboard/DashboardPage.tsx
-  10:6  error  Parsing error: Unexpected token QuickAction
-
-/workspace/src/frontend/src/components/Dashboard/MetricsCard.tsx
-  5:25  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Dashboard/QuickActions.tsx
-  5:6  error  Parsing error: Unexpected token Action
-
-/workspace/src/frontend/src/components/Dashboard/RecentActivity.tsx
-  7:35  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Help/CategoryNav.js
-  13:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Help/CategoryNav.tsx
-  6:6  error  Parsing error: Unexpected token Props
-
-/workspace/src/frontend/src/components/Help/HelpArticle.js
-  18:13  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Help/HelpArticle.tsx
-  8:18  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Help/HelpCenter.js
-  22:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Help/HelpCenter.tsx
-  8:17  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Help/SupportTicket.js
-  22:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Help/SupportTicket.tsx
-  6:20  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Profile/ActivityTab.js
-  18:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/ActivityTab.tsx
-  5:26  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Profile/PreferencesTab.js
-  23:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/PreferencesTab.tsx
-  9:30  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Profile/ProfileEditor.js
-  22:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/ProfileEditor.tsx
-  9:26  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/components/Profile/ProfilePage.js
-  18:24  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/ProfilePage.tsx
-  16:16  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/SecurityTab.js
-  22:9  error  Parsing error: Unexpected token <
-
-/workspace/src/frontend/src/components/Profile/SecurityTab.tsx
-  7:26  error  Parsing error: Unexpected token :
-
-/workspace/src/frontend/src/types/auth.types.ts
-  2:8  error  Parsing error: Unexpected token interface
-
-/workspace/src/frontend/src/types/custom.d.ts
-  1:9  error  Parsing error: Unexpected token module
-
-/workspace/src/frontend/src/types/global.d.ts
-  1:9  error  Parsing error: Unexpected token module
-
-/workspace/src/frontend/src/types/index.ts
-  2:8  error  Parsing error: Unexpected token interface
-
-/workspace/src/frontend/src/utils/helpers.ts
-  1:26  error  Parsing error: Unexpected token :
-
-✖ 40 problems (40 errors, 0 warnings)
-
+Error: Cannot find module '@typescript-eslint/eslint-plugin'
+Require stack:
+- /workspace/eslint.config.js
+    at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
+    at Module._load (node:internal/modules/cjs/loader:1038:27)
+    at Module.require (node:internal/modules/cjs/loader:1289:19)
+    at require (node:internal/modules/helpers:182:18)
+    at Object.<anonymous> (/workspace/eslint.config.js:18:29)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at cjsLoader (node:internal/modules/esm/translators:298:15)
