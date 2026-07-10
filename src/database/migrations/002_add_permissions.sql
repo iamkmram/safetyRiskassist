@@ -1,13 +1,14 @@
 -- 002_add_permissions.sql
--- Permission table linking users to roles
+-- Adds a permissions table and a manytomany relationship between users and permissions
 
-CREATE TABLE IF NOT EXISTS roles (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
+CREATE TABLE IF NOT EXISTS permissions (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(100) UNIQUE NOT NULL,
+    description TEXT
 );
 
-CREATE TABLE IF NOT EXISTS user_roles (
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    role_id INTEGER REFERENCES roles(id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, role_id)
+CREATE TABLE IF NOT EXISTS user_permissions (
+    user_id     UUID REFERENCES users(id) ON DELETE CASCADE,
+    permission_id UUID REFERENCES permissions(id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, permission_id)
 );

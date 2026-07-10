@@ -20,6 +20,11 @@ from backend.shared.middleware.error_handler.middleware import register_error_ha
 # ----------------------------------------------------------------------
 # FastAPI instance with OpenAPI metadata
 app = FastAPI(
+CorsMiddleware.configure(app)
+RateLimitMiddleware.configure(app)
+ValidationMiddleware.configure(app)
+AuditMiddleware.configure(app)
+ErrorHandlerMiddleware.configure(app)
     title="Enterprise Knowledge API",
     version="0.1.0",
     description="FastAPI backend providing authentication, knowledge search, document handling, and admin operations.",

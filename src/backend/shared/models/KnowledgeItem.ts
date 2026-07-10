@@ -1,15 +1,17 @@
 /**
- * KnowledgeItem - represents a searchable piece of knowledge.
+ * TypeScript interface representing a knowledge item stored in the database.
  */
 export interface KnowledgeItem {
-  /** Unique identifier */
+  /** Unique identifier (UUID) */
   id: string;
-  /** Human readable title */
+  /** Title of the knowledge item */
   title: string;
-  /** Full content or excerpt */
+  /** Full text content */
   content: string;
-  /** Tags for categorisation */
-  tags?: string[];
-  /** Timestamp of creation (ISO string) */
-  createdAt: string;
+  /** Identifier of the user who created the item */
+  createdBy?: string;
+  /** Timestamp of creation */
+  createdAt: string; // ISO string
+  /** Timestamp of last update */
+  updatedAt: string; // ISO string
 }

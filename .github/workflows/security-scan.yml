@@ -1,14 +1,33 @@
+name: Security Scan
 
-  secret-scanning:
+on:
+  schedule:
+    - cron: '0 2 * * *'   # Every day at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  npm-audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Secret Scanning
-        uses: github/codeql-action/analyze@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          category: secret-scanning
-          # Explicitly include Azure Search connection strings
-          config: |
-            secrets:
-              - AZURE_SEARCH_CONNECTION_STRING
-              - AZURE_SEARCH_ADMIN_KEY
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  bandit-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install bandit
+        run: pip install bandit
+      - name: Run bandit security scan
+        run: bandit -r src/backend

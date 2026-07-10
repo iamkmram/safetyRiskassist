@@ -35,7 +35,7 @@ export class DatabaseService {
   /**
    * Execute a query that returns multiple rows.
    */
-  public async query<T = any>(text: string, params?: any[]): Promise<pg.QueryResult<T>> {
+  public async query<T = any>(text: string, params?: any[]): Promise<pgpg.QueryResult<T>> {
     const client = await this.pool.connect();
     try {
       const res = await client.query<T>(text, params);

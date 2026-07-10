@@ -1,24 +1,35 @@
+import { DatabaseService } from './DatabaseService';
+
 /**
- * PermissionService - simple inmemory permission checker.
- * In a real system this would query a DB or external IAM.
+ * Service that encapsulates permissionrelated queries.
  */
-
-type Role = 'admin' | 'user' | 'guest';
-
 export class PermissionService {
+  private static db = DatabaseService.getInstance();
+
   /**
-   * Checks whether a given role is allowed to perform an action.
-   * @param role - role of the caller
-   * @param required - minimum role required
+   * Returns an array of permission names granted to a user.
    */
-  public static hasPermission(role: Role, required: Role): boolean {
-    const hierarchy: Role[] = ['guest', 'user', 'admin'];
-    const roleIdx = hierarchy.indexOf(role);
-    const reqIdx = hierarchy.indexOf(required);
-    if (roleIdx === -1 || reqIdx === -1) {
-      console.warn(`Unknown role provided: ${role} or ${required}`);
-      return false;
+  public static async getUserPermissions(userId: string): Promise<string[]> {
+    const query = `
+      SELECT p.name
+      FROM permissions p
+      JOIN user_permissions up ON up.permission_id = p.id
+      WHERE up.user_id = $1
+    `;
+    try {
+      const result = await this.db.query<{ name: string }>(query, [userId]);
+      return result.rows.map((row) => row.name);
+    } catch (err) {
+      console.error('Failed to load permissions for user', userId, err);
+      return []; // Failsafe: treat as no permissions
     }
-    return roleIdx >= reqIdx;
+  }
+
+  /**
+   * Checks whether a user has a specific permission.
+   */
+  public static async userHasPermission(userId: string, permission: string): Promise<boolean> {
+    const perms = await this.getUserPermissions(userId);
+    return perms.includes(permission);
   }
 }

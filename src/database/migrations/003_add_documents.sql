@@ -1,10 +1,10 @@
 -- 003_add_documents.sql
--- Simple documents table used by the documents function package
+-- Adds a documents table linked to knowledge items
 
 CREATE TABLE IF NOT EXISTS documents (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    knowledge_item_id UUID REFERENCES knowledge_items(id) ON DELETE CASCADE,
+    filename        VARCHAR(255) NOT NULL,
+    file_url        TEXT NOT NULL,
+    uploaded_at     TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

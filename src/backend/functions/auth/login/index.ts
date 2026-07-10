@@ -1,45 +1,79 @@
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { validateCredentials } from '../../../shared/services/AuthService';
-import { generateJwt } from '../../../shared/services/TokenService';
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
+import { DatabaseService } from '../../../../shared/services/DatabaseService';
+import { PermissionService } from '../../../../shared/services/PermissionService';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-prod';
+const JWT_EXPIRES_IN = '1h'; // 1 hour
 
 /**
- * HTTP trigger for user login.
- * Expects JSON body: { email: string, password: string }
- * Returns 200 with { token } on success, 400/401 on failure.
+ * Lambda entry point for user login.
+ * Validates input, checks credentials, issues JWT and logs the event.
  */
-const httpTrigger: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+export const handler = async (
+  event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> => {
   try {
-    const { email, password } = req.body || {};
-
-    if (typeof email !== 'string' || typeof password !== 'string') {
-      context.res = {
-        status: 400,
-        body: { error: 'Email and password must be strings.' },
-      };
-      return;
+    if (!event.body) {
+      return response(400, { message: 'Request body is required.' });
     }
 
-    const isValid = await validateCredentials(email, password);
-    if (!isValid) {
-      context.res = {
-        status: 401,
-        body: { error: 'Invalid credentials.' },
-      };
-      return;
+    const { email, password } = JSON.parse(event.body);
+
+    // Input validation
+    if (!email || !password) {
+      return response(400, { message: 'Both email and password are required.' });
     }
 
-    const token = generateJwt({ email });
-    context.res = {
-      status: 200,
-      body: { token },
+    const db = DatabaseService.getInstance();
+    const user = await db.queryOne(
+      'SELECT id, email, password_hash, full_name FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (!user) {
+      return response(401, { message: 'Invalid credentials.' });
+    }
+
+    const passwordMatches = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatches) {
+      return response(401, { message: 'Invalid credentials.' });
+    }
+
+    // Optional: fetch permissions for the token payload
+    const permissions = await PermissionService.getUserPermissions(user.id);
+
+    const tokenPayload = {
+      sub: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      perms: permissions,
     };
-  } catch (err) {
-    console.error('Login function error:', err);
-    context.res = {
-      status: 500,
-      body: { error: 'Internal server error.' },
-    };
+
+    const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+
+    // Audit log (could be replaced by a dedicated service)
+    console.log(
+      JSON.stringify({
+        action: 'login',
+        userId: user.id,
+        timestamp: new Date().toISOString(),
+        ip: event.requestContext.identity?.sourceIp,
+      })
+    );
+
+    return response(200, { token });
+  } catch (error) {
+    console.error('Login handler error:', error);
+    return response(500, { message: 'Internal server error.' });
   }
 };
 
-export default httpTrigger;
+function response(statusCode: number, body: unknown): APIGatewayProxyResultV2 {
+  return {
+    statusCode,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  };
+}

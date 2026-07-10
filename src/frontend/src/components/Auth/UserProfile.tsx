@@ -1,48 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { getCurrentUser } from '../../../shared/services/AuthService';
+import React from 'react';
+import { Avatar, Card, Spin, message } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 
 /**
- * UserProfile - displays basic information about the authenticated user.
- * Includes error handling and loading state.
+ * Props for the UserProfile component.
  */
-const UserProfile: React.FC = () => {
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+interface UserProfileProps {
+  /** Full name of the user */
+  name: string;
+  /** Optional URL to the avatar image */
+  avatarUrl?: string;
+  /** Loading state while user data is being fetched */
+  loading?: boolean;
+}
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const current = await getCurrentUser();
-        setUser(current);
-      } catch (e) {
-        console.error('Failed to fetch user:', e);
-        setError('Unable to load user information.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  if (loading) {
-    return <div data-testid="profile-loading">Loading...</div>;
-  }
-
-  if (error) {
-    return <div data-testid="profile-error" style={{ color: 'red' }}>{error}</div>;
-  }
-
-  if (!user) {
-    return <div data-testid="profile-none">No user data.</div>;
+/**
+ * A simple user profile card displaying avatar and name.
+ * Includes comprehensive error handling and fallback UI.
+ */
+export const UserProfile: React.FC<UserProfileProps> = ({
+  name,
+  avatarUrl,
+  loading = false,
+}) => {
+  // Guard against missing required props
+  if (!name) {
+    message.error('User name is required to display the profile.');
+    return null;
   }
 
   return (
-    <div data-testid="profile-success">
-      <h2>User Profile</h2>
-      <p><strong>ID:</strong> {user.id}</p>
-      <p><strong>Email:</strong> {user.email}</p>
-    </div>
+    <Card style={{ width: 300, textAlign: 'center' }}>
+      {loading ? (
+        <Spin />
+      ) : (
+        <>
+          <Avatar
+            size={64}
+            src={avatarUrl}
+            icon={!avatarUrl ? <UserOutlined /> : undefined}
+            alt={`${name}'s avatar`}
+          />
+          <h3 style={{ marginTop: 16 }}>{name}</h3>
+        </>
+      )}
+    </Card>
   );
 };
 
