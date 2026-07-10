@@ -1,9 +1,11 @@
-import { DatabaseService } from "./DatabaseService";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SearchService = void 0;
 /**
  * SearchService - very simple fulltext search over the KnowledgeItem table.
  * For the prototype we perform a LIKE query on the title field.
  */
-export class SearchService {
+class SearchService {
     static async search(query) {
         const sql = `
       SELECT id, title, excerpt, category, content, updated_at
@@ -11,6 +13,7 @@ export class SearchService {
       WHERE title LIKE ? OR content LIKE ?
     `;
         const param = `%${query}%`;
-        return DatabaseService.query(sql, [param, param]);
+        //     return DatabaseService.query<KnowledgeItem>(sql, [param, param]);
     }
 }
+exports.SearchService = SearchService;

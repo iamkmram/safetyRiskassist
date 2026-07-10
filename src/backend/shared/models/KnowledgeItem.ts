@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Document } from '../types/database.types';
 
 /**

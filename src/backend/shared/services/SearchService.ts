@@ -13,6 +13,6 @@ export class SearchService {
       WHERE title LIKE ? OR content LIKE ?
     `;
     const param = `%${query}%`;
-//     return DatabaseService.query<KnowledgeItem>(sql, [param, param]);
+return DatabaseService.query<KnowledgeItem>(sql, [param, param]);
   }
 }

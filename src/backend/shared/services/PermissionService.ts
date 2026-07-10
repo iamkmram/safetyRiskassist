@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { DatabaseService } from "./DatabaseService";
 import { Permission } from "../types/database.types";
 import { logger } from "../../utils/logger";

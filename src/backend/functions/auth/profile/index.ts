@@ -59,4 +59,6 @@ export const handler: AzureFunction = async (context: Context, req: HttpRequest)
       };
     }
   }
+        return;;
+        
 };

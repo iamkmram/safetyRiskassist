@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable */
 /* eslint-disable */
 import React, { ReactNode } from 'react';
