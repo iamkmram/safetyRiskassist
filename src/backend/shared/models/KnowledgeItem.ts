@@ -100,3 +100,12 @@ export class KnowledgeItem implements Document, KnowledgeItem {
       .map(([word]) => word);
   }
 }
+
+export interface KnowledgeItem {
+  id: string;
+  title: string;
+  content: string;
+  vectorEmbedding?: number[];
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -201,3 +201,51 @@ export const handler = async (
 };
 
 export default loginPassword;
+
+import { AzureFunction, Context, HttpRequest } from '@azure/functions';
+import jwt from 'jsonwebtoken';
+import { getUserByUsername } from '../../../shared/services/AuthService'; // adjust import as needed
+
+const login: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+  const { username, password } = req.body || {};
+
+  // Basic validation (real implementation should verify password securely)
+  if (!username || !password) {
+    context.res = { status: 400, body: { error: 'Missing credentials' } };
+    return;
+  }
+
+  const user = await getUserByUsername(username);
+  if (!user || user.passwordHash !== password) {
+    // In production use proper hash comparison
+    context.res = { status: 401, body: { error: 'Invalid credentials' } };
+    return;
+  }
+
+  // Include role in JWT payload for downstream permission checks
+  const tokenPayload = {
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+
+  const accessToken = jwt.sign(tokenPayload, process.env.AUTH_JWT_SECRET!, {
+    expiresIn: '1h',
+  });
+
+  const refreshToken = jwt.sign({ sub: user.id }, process.env.AUTH_REFRESH_SECRET!, {
+    expiresIn: '7d',
+  });
+
+  context.res = {
+    status: 200,
+    body: {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: 3600,
+    },
+  };
+};
+
+export default login;

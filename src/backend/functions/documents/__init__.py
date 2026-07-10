@@ -49,3 +49,37 @@ async def list_documents():
 async def upload_document(file: UploadFile = File(...)):
     # Real implementation will store to Azure Blob Storage
     raise HTTPException(status_code=501, detail="Not implemented yet")
+
+import os
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents import SearchClient
+
+def index_document(knowledge_item_id: str) -> None:
+    """
+    Pushes a document associated with a knowledge item into Azure AI Search
+    and stores a reference in the database.
+    """
+    # Retrieve the document metadata from the DB (pseudocode - replace with real call)
+    from ...services.DatabaseService import KnowledgeDatabaseService
+    db = KnowledgeDatabaseService()
+    doc = db.get_document_by_knowledge_item_id(knowledge_item_id)
+
+    if not doc:
+        raise ValueError(f'No document found for knowledge_item_id {knowledge_item_id}')
+
+    endpoint = os.getenv('AZURE_SEARCH_ENDPOINT')
+    admin_key = os.getenv('AZURE_SEARCH_ADMIN_KEY')
+    index_name = os.getenv('AZURE_SEARCH_INDEX', 'knowledge-index')
+
+    search_client = SearchClient(endpoint=endpoint,
+                                 index_name=index_name,
+                                 credential=AzureKeyCredential(admin_key))
+
+    search_client.upload_documents([
+        {
+            "id": doc.id,
+            "knowledge_item_id": doc.knowledge_item_id,
+            "content": doc.file_path,   # or pull actual content as needed
+            "metadata": doc.metadata,
+        }
+    ])

@@ -490,3 +490,27 @@ export default UserProfile;
 export const Placeholder = () => {
   return <div>Placeholder component for ${__dirname}</div>;
 };
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Avatar, Text } from '@fluentui/react-components';
+
+export const UserProfile: React.FC = () => {
+  const [role, setRole] = useState<string>('');
+
+  useEffect(() => {
+    axios
+      .get('/api/v1/auth/profile')
+      .then((res) => setRole(res.data.role))
+      .catch(() => setRole(''));
+  }, []);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {/* Existing avatar / name UI */}
+      <Avatar name="User" size={48} />
+      {/* New role display */}
+      <Text variant="medium">Role: {role}</Text>
+    </div>
+  );
+};

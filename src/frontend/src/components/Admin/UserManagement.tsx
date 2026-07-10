@@ -78,3 +78,28 @@ const UserManagement: React.FC<UserManagementProps> = () => {
 };
 
 export default UserManagement;
+
+import React from 'react';
+import { Button } from '@fluentui/react-components';
+import axios from 'axios';
+
+const refreshKnowledgeIndex = async () => {
+  try {
+    await axios.post('/api/v1/knowledge/reindex');
+    alert('Knowledge index refreshed successfully.');
+  } catch (error) {
+    console.error(error);
+    alert('Failed to refresh knowledge index.');
+  }
+};
+
+export const UserManagement: React.FC = () => {
+  // Existing management UI ...
+
+  return (
+    <div>
+      {/* Existing UI elements */}
+      <Button onClick={refreshKnowledgeIndex}>Refresh Knowledge Index</Button>
+    </div>
+  );
+};
