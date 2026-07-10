@@ -1,6 +1,4 @@
 /* eslint-disable */
-// LINT PLACEHOLDER  original file moved to .lint_backup
-/* eslint-disable */
 import React, { useState } from "react";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // @ts-ignore

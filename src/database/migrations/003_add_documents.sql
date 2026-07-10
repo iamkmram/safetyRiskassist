@@ -1,16 +1,12 @@
--- ------------------------------------------------------------------
 -- 003_add_documents.sql
--- Table for document metadata that can be attached to knowledge items
--- ------------------------------------------------------------------
+-- Documents uploaded by users
 
-CREATE TABLE documents (
-    id               VARCHAR(36) PRIMARY KEY,
-    name             VARCHAR(255) NOT NULL,
-    mime_type        VARCHAR(100),
-    storage_url      VARCHAR(1024) NOT NULL,
-    uploaded_by      VARCHAR(36) REFERENCES users(id),
-    department_id    VARCHAR(36) REFERENCES departments(id),
-    required_permission VARCHAR(100), -- permission key needed to access
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS documents (
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    user_id INT NOT NULL,
+    filename NVARCHAR(255) NOT NULL,
+    content_type NVARCHAR(100),
+    storage_url NVARCHAR(500) NOT NULL,
+    uploaded_at DATETIME2 DEFAULT SYSDATETIME(),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );

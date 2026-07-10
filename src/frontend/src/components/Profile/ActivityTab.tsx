@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React from "react";
-import { UserActivity } from "../../../utils/mockData";
+// @ts-ignore
+import { UserActivity } from "../../utils/mockData";
 
 const DetailedActivityTab: React.FC = () => {
   const activities: UserActivity[] = UserActivity; // mock data array

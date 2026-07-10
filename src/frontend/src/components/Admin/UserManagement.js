@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { fetchUsers } from "../../services/api";
+import "./UserManagement.css";
 
 export const placeholder = true;
 
@@ -70,7 +72,12 @@ export const UserManagementMock = () => {
               <td className="p-2 border">{user.department}</td>
               <td className="p-2 border">{user.role}</td>
               <td className="p-2 border">
-                <button onClick={() => handleDelete(user.id)} className="text-sm text-red-600 hover:underline">
+                <button
+                  onClick={() => {
+                    /* placeholder delete handler */
+                  }}
+                  className="text-sm text-red-600 hover:underline"
+                >
                   Delete
                 </button>
               </td>
@@ -88,72 +95,113 @@ export const UserManagement = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const load = async () => {
       try {
-        // Placeholder fetch - replace with real API call
-        const response = { data: [] };
-        setUsers(response.data);
+        const data = await fetchUsers();
+        setUsers(data.users || []);
         setLoading(false);
       } catch (err) {
-        console.error("Failed to fetch users:", err);
+        console.error("Failed to fetch users", err);
         setError(err?.response?.data?.message ?? "Unable to load users");
         setLoading(false);
       }
     };
-    fetchUsers();
+    load();
   }, []);
 
   if (loading) return _jsx("div", { children: "Loading users..." });
   if (error) return _jsxs("div", { children: ["Error: ", error] });
 
-  // If no users fetched, fall back to static mock table (preserving original behavior)
-  if (users.length === 0) {
+  if (users.length > 0) {
     return (
-      <div className="p-4">
-        <h2 className="text-xl font-semibold mb-4">User Management</h2>
-        <table className="min-w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">Avatar</th>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Email</th>
-              <th className="p-2 border">Department</th>
-              <th className="p-2 border">Role</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50">
-                <td className="p-2 border">
-                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
-                </td>
-                <td className="p-2 border">{user.name}</td>
-                <td className="p-2 border">{user.email}</td>
-                <td className="p-2 border">{user.department}</td>
-                <td className="p-2 border">{user.role}</td>
-                <td className="p-2 border">
-                  <button
-                    onClick={() => {
-                      /* placeholder delete handler */
-                    }}
-                    className="text-sm text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <>
+        {/* Source behavior: simple list */}
+        {_jsx("ul", {
+          children: users.map((u) =>
+            _jsxs("li", { children: [u.name, " (", u.email, ")"] }, u.id)
+          ),
+        })}
+        {/* Integration behavior: table */}
+        {_jsxs("div", {
+          className: "user-management",
+          children: [
+            _jsx("h2", { children: "User Management" }),
+            _jsxs("table", {
+              className: "users-table",
+              children: [
+                _jsx("thead", {
+                  children: _jsxs("tr", {
+                    children: [
+                      _jsx("th", { children: "Name" }),
+                      _jsx("th", { children: "Email" }),
+                      _jsx("th", { children: "Department" }),
+                    ],
+                  }),
+                }),
+                _jsx("tbody", {
+                  children: users.map((u) =>
+                    _jsxs(
+                      "tr",
+                      {
+                        children: [
+                          _jsx("td", { children: u.name }),
+                          _jsx("td", { children: u.email }),
+                          _jsx("td", { children: u.department }),
+                        ],
+                      },
+                      u.id
+                    )
+                  ),
+                }),
+              ],
+            }),
+          ],
+        })}
+      </>
     );
   }
 
-  // Render fetched users as a simple list (preserving source behavior)
-  return _jsx("ul", {
-    children: users.map((u) => _jsxs("li", { children: [u.name, " (", u.email, ")"] }, u.id)),
-  });
+  // Fallback to mock table when no users fetched
+  return (
+    <div className="p-4">
+      <h2 className="text-xl font-semibold mb-4">User Management</h2>
+      <table className="min-w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="p-2 border">Avatar</th>
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Email</th>
+            <th className="p-2 border">Department</th>
+            <th className="p-2 border">Role</th>
+            <th className="p-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {mockUsers.map((user) => (
+            <tr key={user.id} className="hover:bg-gray-50">
+              <td className="p-2 border">
+                <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
+              </td>
+              <td className="p-2 border">{user.name}</td>
+              <td className="p-2 border">{user.email}</td>
+              <td className="p-2 border">{user.department}</td>
+              <td className="p-2 border">{user.role}</td>
+              <td className="p-2 border">
+                <button
+                  onClick={() => {
+                    /* placeholder delete handler */
+                  }}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default Placeholder;

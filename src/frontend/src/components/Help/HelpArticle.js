@@ -3,8 +3,7 @@
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
-/* eslint-disable */
-// @ts-nocheck
+/* @ts-nocheck */
 import React from "react";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useParams } from "react-router-dom";

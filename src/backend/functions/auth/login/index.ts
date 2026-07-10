@@ -9,7 +9,12 @@ import { User } from '../../../shared/types/database.types';
 // @ts-ignore - suppressed by automated fix script
 // @ts-ignore - suppressed by automated fix script
 import { logger } from '../../../../utils/logger';
-import { mockAuthenticate, AuthService, AuthError } from '../../../shared/services/AuthService';
+import {
+  mockAuthenticate,
+  AuthService,
+  AuthError,
+  getUserByUsername as getUserByUsernameFromAuthService,
+} from '../../../shared/services/AuthService';
 import { getSettings, getUserByUsername } from '../../../config';
 import { hashPassword, verifyPassword } from '../../../utils/auth';
 
@@ -182,8 +187,6 @@ export const loginDemo: AzureFunction = async (context: Context, req: HttpReques
 
 /**
  * AWS Lambda handler for retrieving the Azure AD login URL.
-// @ts-ignore - suppressed by automated fix script
-// @ts-ignore - suppressed by automated fix script
  *
  * Returns JSON containing the URL configured via the AZURE_AD_LOGIN_URL environment variable.
  */
@@ -350,70 +353,48 @@ export const httpTriggerLegacy: AzureFunction = async (context: Context, req: Ht
 };
 
 /**
- * Legacy AWS Lambda handler for login URL (from base version).
+ * Login function from integration branch (simple JWT with extra claims).
+ * Exported as default to preserve previous default export behavior.
  */
-export const loginUrlLegacyHandler = async (
-  _event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyResultV2> => {
-  try {
-    const loginUrl = process.env.AZURE_AD_LOGIN_URL ?? '';
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: loginUrl }),
-    };
-  } catch (error) {
-    console.error('Login URL fetch error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
-  }
-};
-
-/**
- * Legacy login implementation from base version (uses getUserByUsername directly).
- */
-export const loginLegacy: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
+const simpleLogin: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
   const { username, password } = req.body || {};
 
   if (!username || !password) {
-    context.res = {
-      status: 400,
-      body: { error: 'Missing username or password' },
+    context.res = { status: 400, body: { error: 'Missing credentials' } };
+    return;
+  }
+
+  try {
+    const user = await getUserByUsernameFromAuthService(username);
+    if (!user || user.passwordHash !== password) {
+      context.res = { status: 401, body: { error: 'Invalid credentials' } };
+      return;
+    }
+
+    const tokenPayload = {
+      sub: user.id,
+      name: user.name,
+      department: user.department,
+      roles: user.roles,
     };
-    return;
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET!, {
+      expiresIn: '1h',
+      algorithm: 'HS256',
+    });
+
+    context.res = {
+      status: 200,
+      body: {
+        access_token: token,
+        refresh_token: 'placeholder-refresh-token',
+        expires_in: 3600,
+      },
+    };
+  } catch (err) {
+    context.log.error('Login error', err);
+    context.res = { status: 500, body: { error: 'Internal server error' } };
   }
-
-  const user = await getUserByUsername(username);
-  if (!user || user.passwordHash !== password) {
-    context.res = { status: 401, body: { error: 'Invalid credentials' } };
-    return;
-  }
-
-  const tokenPayload = {
-    sub: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
-
-  const accessToken = jwt.sign(tokenPayload, process.env.AUTH_JWT_SECRET!, {
-    expiresIn: '1h',
-  });
-
-  const refreshToken = jwt.sign({ sub: user.id }, process.env.AUTH_REFRESH_SECRET!, {
-    expiresIn: '7d',
-  });
-
-  context.res = {
-    status: 200,
-    body: {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: 3600,
-    },
-  };
 };
 
-export default loginPassword;
+export default simpleLogin;

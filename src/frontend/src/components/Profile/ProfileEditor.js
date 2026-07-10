@@ -1,6 +1,5 @@
 /* eslint-disable */
 // LINT PLACEHOLDER  original file moved to .lint_backup
-// This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
 /* eslint-disable */
@@ -15,7 +14,6 @@ export default function ProfileEditor() {
         setProfile({ ...profile, [e.target.name]: e.target.value });
     };
     const handleSave = () => {
-        // In a real app, call an API. Here we just log.
         console.log("Saved profile:", profile);
         alert("Profile saved successfully!");
     };

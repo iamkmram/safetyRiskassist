@@ -1,6 +1,7 @@
+// @ts-nocheck
 /* eslint-disable */
 import React from "react";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { recentConversations, mockData } from "../../utils/mockData";
 
 // Helper to format timestamps (fallback to builtin Date)

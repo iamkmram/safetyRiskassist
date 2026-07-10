@@ -18,6 +18,10 @@ export interface KnowledgeItem {
   content: string;
   /** Category of the article */
   category?: string;
+  /** Embedding vector (integration) */
+  embeddingVector?: number[];
+  /** Vector embedding data (source) */
+  vectorEmbedding?: number[];
   /** Creation timestamp (ISO8601) */
   created_at: string;
   /** Last updated timestamp (ISO8601) */
@@ -36,8 +40,6 @@ export interface KnowledgeItem {
   department_id?: string;
   /** Permission key required to view this item */
   required_permission?: string;
-  /** Vector embedding data */
-  vectorEmbedding?: number[];
 }
 
 /**
@@ -56,6 +58,8 @@ export class KnowledgeItem implements Document, KnowledgeItem {
   article_id?: string;
   excerpt?: string;
   category?: string;
+  embeddingVector?: number[];
+  vectorEmbedding?: number[];
   is_popular?: boolean;
   is_published?: boolean;
   view_count?: number;
@@ -63,7 +67,6 @@ export class KnowledgeItem implements Document, KnowledgeItem {
   createdAt?: string | Date;
   department_id?: string;
   required_permission?: string;
-  vectorEmbedding?: number[];
 
   constructor(doc: Document) {
     this.id = (doc as any).id;
@@ -76,6 +79,8 @@ export class KnowledgeItem implements Document, KnowledgeItem {
     this.article_id = (doc as any).article_id;
     this.excerpt = (doc as any).excerpt;
     this.category = (doc as any).category;
+    this.embeddingVector = (doc as any).embeddingVector;
+    this.vectorEmbedding = (doc as any).vectorEmbedding;
     this.is_popular = (doc as any).is_popular;
     this.is_published = (doc as any).is_published;
     this.view_count = (doc as any).view_count;
@@ -83,7 +88,6 @@ export class KnowledgeItem implements Document, KnowledgeItem {
     this.createdAt = (doc as any).createdAt;
     this.department_id = (doc as any).department_id;
     this.required_permission = (doc as any).required_permission;
-    this.vectorEmbedding = (doc as any).vectorEmbedding;
   }
 
   /** Return first N characters of content for preview */
@@ -110,11 +114,4 @@ export class KnowledgeItem implements Document, KnowledgeItem {
       .slice(0, 5)
       .map(([word]) => word);
   }
-}
-
-/**
- * Additional metadata interface augmentations (preserved for compatibility)
- */
-export interface KnowledgeItem {
-  // Duplicate declarations merged by TypeScript.
 }

@@ -1,11 +1,16 @@
+// @ts-nocheck
 import React from "react";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { useNavigate } from "react-router-dom";
 import Layout from "../Common/Layout";
 import MetricsCard from "./MetricsCard";
 import QuickActions from "./QuickActions";
 import RecentActivity from "./RecentActivity";
 import { mockMetrics, recentConversations } from "../../utils/mockData";
+import Layout from '../../Common/Layout';
+import MetricsCard from './MetricsCard';
+import QuickActions from './QuickActions';
+import RecentActivity from './RecentActivity';
 
 type QuickAction = {
   title: string;

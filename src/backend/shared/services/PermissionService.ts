@@ -9,6 +9,9 @@ import { logger } from "../../utils/logger";
 import { getConnection } from "typeorm";
 import { UserRole } from "../models/UserRole";
 import { sql } from "@vercel/postgres";
+import { queryDatabase } from "../utils/database";
+import { PermissionRow } from "../types/database.types";
+import * as crypto from "crypto";
 
 /**
  * Service responsible for permission checks.
@@ -251,6 +254,19 @@ export class PermissionService {
         AND p.resource = ${resource}
         AND p.action = ${action}
       LIMIT 1`;
+    return result.length > 0;
+  }
+
+  /**
+   * Checks whether the given user has the `dashboard_view` permission.
+   */
+  static async hasDashboardAccess(userId: string): Promise<boolean> {
+    const query = `
+      SELECT 1 FROM permissions
+      WHERE user_id = @userId
+        AND permission_name = 'dashboard_view'
+    `;
+    const result = await queryDatabase<PermissionRow>(query, { userId });
     return result.length > 0;
   }
 }
