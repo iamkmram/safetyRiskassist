@@ -1,0 +1,222 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { getDashboardMetrics } from '../../backend/shared/services/DatabaseService';
+import { MetricCard } from './MetricCard';
+import './UserProfile.css';
+import { toast } from '../../components/Common/Toast';
+import { fetcher } from '../../services/api';
+
+export interface AuthUser {
+  id: string;
+  display_name: string;
+  email: string;
+  department: string;
+  role: string;
+  avatar: string;
+  photo_url?: string;
+}
+
+type Metrics = {
+  totalQueriesThisWeek: number;
+  mostSearchedTopics: string[];
+  recentConversations: { id: string; snippet: string; timestamp: string }[];
+  trendingTravelAlerts: number;
+};
+
+export const UserProfile: React.FC = () => {
+  const { user, token } = useAuth();
+  const navigate = useNavigate();
+
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [showBanner, setShowBanner] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [profileUser, setProfileUser] = useState<AuthUser | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState<boolean>(true);
+  const [loadingMetrics, setLoadingMetrics] = useState<boolean>(true);
+
+  // Load dashboard metrics
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      try {
+        const data = await getDashboardMetrics(token);
+        setMetrics(data);
+      } catch (err) {
+        console.error('Failed to load dashboard metrics', err);
+      } finally {
+        setLoadingMetrics(false);
+      }
+    };
+    fetchMetrics();
+  }, [token]);
+
+  // Load simple user profile (fallback if useAuth does not provide all fields)
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await fetcher<AuthUser>('/users/me');
+        setProfileUser(data);
+      } catch (err) {
+        toast.error('Failed to load user profile');
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    loadProfile();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('remember_me');
+    toast.success('You have been logged out');
+    navigate('/login');
+  };
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      const encoded = encodeURIComponent(searchQuery.trim());
+      navigate(`/chat?query=${encoded}`);
+    }
+  };
+
+  const quickActions = [
+    {
+      title: 'Latest COVID19 Restrictions',
+      description: 'Get current travel requirements',
+      query: 'What are the latest COVID19 travel restrictions?'
+    },
+    {
+      title: 'HighRisk Destinations',
+      description: 'View current travel warnings',
+      query: 'Show me highrisk travel destinations'
+    },
+    {
+      title: 'Emergency Protocols',
+      description: 'Access emergency procedures',
+      query: 'What emergency protocols should I follow?'
+    },
+    {
+      title: 'Weather Alerts',
+      description: 'Check severe weather warnings',
+      query: 'Are there any weatherrelated travel alerts?'
+    }
+  ];
+
+  if (loadingProfile && loadingMetrics) {
+    return <div className="p-4">Loading dashboard...</div>;
+  }
+
+  const displayName = user?.name ?? profileUser?.display_name ?? 'User';
+  const department = user?.department ?? profileUser?.department ?? '';
+  const avatarUrl = profileUser?.avatar ?? '/avatars/default.jpg';
+
+  return (
+    <div className="dashboard-container">
+      {/* Notification Banner */}
+      {showBanner && (
+        <div className="notification-banner">
+          <span>New travel advisories available</span>
+          <button
+            className="close-btn"
+            onClick={() => setShowBanner(false)}
+            aria-label="Dismiss"
+          />
+        </div>
+      )}
+
+      {/* Welcome Message */}
+      {user && (
+        <h2 className="welcome-msg">
+          Welcome, {displayName} - {department}
+        </h2>
+      )}
+
+      {/* Profile Avatar & Basic Info */}
+      <div className="flex items-center space-x-3 p-4">
+        <img
+          src={avatarUrl}
+          alt={`${displayName} avatar`}
+          className="w-10 h-10 rounded-full"
+        />
+        <div className="text-sm">
+          <div className="font-medium">{displayName}</div>
+          <div className="text-gray-500">{department}</div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="ml-4 text-sm text-red-600 hover:underline"
+          aria-label="Log out"
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* Metrics Cards */}
+      <div className="metrics-grid">
+        {loadingMetrics ? (
+          <p>Loading metrics...</p>
+        ) : metrics ? (
+          <>
+            <MetricCard title="Queries This Week" value={metrics.totalQueriesThisWeek} />
+            <MetricCard title="Most Searched Topics" value={metrics.mostSearchedTopics.join(', ')} />
+            <MetricCard title="Recent Conversations" value={metrics.recentConversations.length} />
+            <MetricCard title="Trending Travel Alerts" value={metrics.trendingTravelAlerts} />
+          </>
+        ) : (
+          <p>No metrics available.</p>
+        )}
+      </div>
+
+      {/* Search Bar */}
+      <div className="search-section">
+        <input
+          type="text"
+          className="search-box"
+          placeholder="Ask about travel risks, safety guidelines, or destination information..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSearchSubmit()}
+        />
+        <button className="search-btn" onClick={handleSearchSubmit}>
+          Search
+        </button>
+      </div>
+
+      {/* Quick Action Cards */}
+      <div className="quick-actions-grid">
+        {quickActions.map(action => (
+          <div
+            key={action.title}
+            className="quick-action-card"
+            onClick={() => navigate(`/chat?query=${encodeURIComponent(action.query)}`)}
+            role="button"
+          >
+            <h3>{action.title}</h3>
+            <p>{action.description}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Right Sidebar - Recent Conversations */}
+      <aside className="recent-conversations-sidebar">
+        <h4>Recent Conversations</h4>
+        <ul>
+          {metrics?.recentConversations.map(conv => (
+            <li key={conv.id}>
+              <a href={`/chat/${conv.id}`}>
+                <span className="snippet">{conv.snippet}</span>
+                <span className="timestamp">{conv.timestamp}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a href="/conversations" className="view-all-link">
+          View All Conversations
+        </a>
+      </aside>
+    </div>
+  );
+};
+
+export default UserProfile;
