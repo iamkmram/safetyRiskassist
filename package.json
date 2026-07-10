@@ -2,6 +2,12 @@
   "name": "project",
   "version": "1.0.0",
   "dependencies": {
-    "typescript": "^7.0.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.71",
+    "@types/react-dom": "^18.2.17",
+    "typescript": "^5.4.5"
   }
 }

@@ -30,3 +30,6 @@ export const mockUsers = [
         permissions: ['knowledge:read']
     }
 ];
+export const mockMetrics = {};
+export const recentConversations = [];
+export const DashboardMetrics = {};

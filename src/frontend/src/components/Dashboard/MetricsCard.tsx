@@ -1,27 +1,13 @@
 import React from "react";
-import { DashboardMetrics } from "../../utils/mockData";
+import { mockMetrics } from "../../utils/mockData";
 
-interface Props {
-  metrics: DashboardMetrics;
-}
+export const MetricsCard: React.FC = () => (
+  <div style={{ border: "1px solid #ccc", padding: "10px", borderRadius: "4px" }}>
+    <h3>Dashboard Summary</h3>
+    <p>Total Queries: {mockMetrics.totalQueries}</p>
+    <p>Weekly Queries: {mockMetrics.weeklyQueries}</p>
+    <p>Active Alerts: {mockMetrics.activeAlerts}</p>
+  </div>
+);
 
-export default function MetricsCard({ metrics }: Props) {
-  const {
-    totalQueries,
-    weeklyQueries,
-    topTopics,
-    recentConversations,
-    activeAlerts,
-  } = metrics;
-
-  return (
-    <div className="metrics-card">
-      <h2>Total Queries: {totalQueries}</h2>
-      <p>Weekly Queries: {weeklyQueries}</p>
-      <p>Top Topics: {topTopics.join(", ")}</p>
-      <p>Recent Conversations: {recentConversations}</p>
-      <p>Active Alerts: {activeAlerts}</p>
-    </div>
-  );
-}
-
+export default MetricsCard;

@@ -1,0 +1,22 @@
+import React from "react";
+import { recentConversations } from "../../utils/mockData";
+
+export const RecentActivity: React.FC = () => (
+  <aside style={{ border: "1px solid #eee", padding: "10px", maxHeight: "300px", overflowY: "auto" }}>
+    <h4>Recent Conversations</h4>
+    <ul style={{ listStyle: "none", padding: 0 }}>
+      {recentConversations.map((c) => (
+        <li
+          key={c.id}
+          style={{ marginBottom: "8px", cursor: "pointer" }}
+          onClick={() => console.log("Open conversation", c.id)}
+        >
+          <strong>{c.title}</strong>
+          <p style={{ margin: 0, fontSize: "smaller", color: "#555" }}>{c.snippet}</p>
+        </li>
+      ))}
+    </ul>
+  </aside>
+);
+
+export default RecentActivity;

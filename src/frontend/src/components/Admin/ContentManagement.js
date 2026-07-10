@@ -1,6 +1,5 @@
-// FIXED placeholder  minimal valid React component
-import React from "react";
-export const Placeholder = () => {
-    return <div>Placeholder component for ${__dirname}</div>;
+import { jsx as _jsx } from "react/jsx-runtime";
+export const ContentManagement = () => {
+    return _jsx("div", { children: "Content Management Placeholder" });
 };
-export default Placeholder;
+export default ContentManagement;

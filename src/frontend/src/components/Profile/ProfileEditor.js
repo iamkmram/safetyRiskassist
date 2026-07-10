@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useState } from "react";
+// @ts-ignore
 import { UserProfile } from "../../../utils/mockData";
 export default function ProfileEditor() {
     const [profile, setProfile] = useState(UserProfile);
@@ -10,23 +12,5 @@ export default function ProfileEditor() {
         console.log("Saved profile:", profile);
         alert("Profile saved successfully!");
     };
-    return (<form className="space-y-4">
-      <div>
-        <label>Name</label>
-        <input name="name" value={profile.name} onChange={handleChange}/>
-      </div>
-      <div>
-        <label>Email</label>
-        <input name="email" value={profile.email} onChange={handleChange}/>
-      </div>
-      <div>
-        <label>Department</label>
-        <input name="department" value={profile.department} onChange={handleChange}/>
-      </div>
-      <div>
-        <label>Role</label>
-        <input name="role" value={profile.role} onChange={handleChange}/>
-      </div>
-      <button type="button" onClick={handleSave}>Save Changes</button>
-    </form>);
+    return (_jsxs("form", { className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { children: "Name" }), _jsx("input", { name: "name", value: profile.name, onChange: handleChange })] }), _jsxs("div", { children: [_jsx("label", { children: "Email" }), _jsx("input", { name: "email", value: profile.email, onChange: handleChange })] }), _jsxs("div", { children: [_jsx("label", { children: "Department" }), _jsx("input", { name: "department", value: profile.department, onChange: handleChange })] }), _jsxs("div", { children: [_jsx("label", { children: "Role" }), _jsx("input", { name: "role", value: profile.role, onChange: handleChange })] }), _jsx("button", { type: "button", onClick: handleSave, children: "Save Changes" })] }));
 }

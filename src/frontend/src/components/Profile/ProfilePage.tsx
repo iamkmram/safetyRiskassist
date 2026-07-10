@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// @ts-ignore
 import Layout from "../../Common/Layout";
 import ProfileEditor from "./ProfileEditor";
 import PreferencesTab from "./PreferencesTab";

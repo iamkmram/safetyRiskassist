@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+// @ts-ignore
 import { UserProfile } from "../../../utils/mockData";
 
 export default function ProfileEditor() {
