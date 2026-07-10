@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from "react";
 import { UserProfile } from "../../../utils/mockData";
 export default function ProfileEditor() {

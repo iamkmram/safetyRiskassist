@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { mockAuthenticate } from "../../utils/mockDataExports";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";

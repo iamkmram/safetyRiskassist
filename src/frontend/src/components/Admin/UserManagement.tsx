@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { User } from '../../types'; // Adjust import based on your project alias

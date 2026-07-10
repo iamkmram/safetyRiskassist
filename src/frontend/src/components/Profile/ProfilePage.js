@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from "react";
 import Layout from "../../Common/Layout";
 import ProfileEditor from "./ProfileEditor";

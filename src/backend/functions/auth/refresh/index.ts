@@ -2,12 +2,11 @@ import { AzureFunction, Context, HttpRequest } from '@azure/functions';
 import { AuthService, AuthError } from '../../../shared/services/AuthService';
 
 /**
- * Azure Function handler for POST /api/v1/auth/login
- * Expected body: { "username": "string", "password": "string" }
+ * Azure Function handler for POST /api/v1/auth/refresh
+ * Expected body: { "refresh_token": "string" }
  * Returns: { access_token, refresh_token, expires_in }
  */
 export const handler: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
-  const log = context.log;
   try {
     if (req.method !== 'POST') {
       context.res = {
@@ -17,20 +16,18 @@ export const handler: AzureFunction = async (context: Context, req: HttpRequest)
       return;
     }
 
-    const { username, password } = req.body ?? {};
+    const { refresh_token } = req.body ?? {};
 
-    if (!username || !password) {
+    if (!refresh_token) {
       context.res = {
         status: 400,
-        body: { error: 'invalid_request', detail: 'username and password required', code: 400 },
+        body: { error: 'invalid_request', detail: 'refresh_token required', code: 400 },
       };
       return;
     }
 
     const authService = new AuthService();
-
-    // Using Resource Owner Password Credentials flow for prototype
-    const tokens = await authService.exchangeAuthCode(username, password, true);
+    const tokens = await authService.refreshToken(refresh_token);
 
     context.res = {
       status: 200,
@@ -45,7 +42,7 @@ export const handler: AzureFunction = async (context: Context, req: HttpRequest)
         body: { error: 'auth_error', detail: err.message, code: err.code },
       };
     } else {
-      log.error('Unexpected error in login handler', err);
+      context.log?.error('Unexpected error in refresh handler', err);
       context.res = {
         status: 500,
         headers: { 'Content-Type': 'application/json' },

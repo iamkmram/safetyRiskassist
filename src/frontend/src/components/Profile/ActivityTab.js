@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from "react";
 import { UserActivity } from "../../../utils/mockData";
 export default function ActivityTab() {

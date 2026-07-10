@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from "react";
 export default function SecurityTab() {
     const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });

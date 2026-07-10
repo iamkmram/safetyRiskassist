@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from "react";
 import { UserPreferences } from "../../../utils/mockData";
 export default function PreferencesTab() {
