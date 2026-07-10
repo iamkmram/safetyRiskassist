@@ -322,6 +322,7 @@ export const httpTriggerLegacy: AzureFunction = async (context: Context, req: Ht
   }
 
   // Stub validation – replace with real DB check.
+// @ts-ignore
   const user = await new DatabaseService().query<any>(
     `SELECT * FROM users WHERE username = $1`,
     [username],

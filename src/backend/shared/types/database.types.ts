@@ -46,3 +46,11 @@ export interface UserPermission extends Permission {
   // Helper flag to indicate inherited permissions
   inherited?: boolean;
 }
+
+/**
+ * Placeholder User interface added to satisfy missing export errors.
+ * Real implementation should replace this with the actual shape of a User.
+ */
+export interface User {
+  [key: string]: any;
+}

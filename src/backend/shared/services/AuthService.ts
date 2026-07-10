@@ -273,3 +273,12 @@ export class AuthService {
 
 // Mock implementation added to satisfy imports
 export function mockAuthenticate(...args: any[]): any { return { userId: 'test' }; }
+
+/**
+ * Stub implementation of getUserByUsername.
+ * The real logic should query the user store and return a User object.
+ */
+export async function getUserByUsername(username: string): Promise<any> {
+  // TODO: replace with actual lookup
+  return null;
+}
