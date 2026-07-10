@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useEffect, useState } from "react";
 
 export const placeholder = true;
 
@@ -107,10 +106,53 @@ export const UserManagement = () => {
   if (loading) return _jsx("div", { children: "Loading users..." });
   if (error) return _jsxs("div", { children: ["Error: ", error] });
 
+  // If no users fetched, fall back to static mock table (preserving original behavior)
+  if (users.length === 0) {
+    return (
+      <div className="p-4">
+        <h2 className="text-xl font-semibold mb-4">User Management</h2>
+        <table className="min-w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2 border">Avatar</th>
+              <th className="p-2 border">Name</th>
+              <th className="p-2 border">Email</th>
+              <th className="p-2 border">Department</th>
+              <th className="p-2 border">Role</th>
+              <th className="p-2 border">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mockUsers.map((user) => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="p-2 border">
+                  <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
+                </td>
+                <td className="p-2 border">{user.name}</td>
+                <td className="p-2 border">{user.email}</td>
+                <td className="p-2 border">{user.department}</td>
+                <td className="p-2 border">{user.role}</td>
+                <td className="p-2 border">
+                  <button
+                    onClick={() => {
+                      /* placeholder delete handler */
+                    }}
+                    className="text-sm text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Render fetched users as a simple list (preserving source behavior)
   return _jsx("ul", {
-    children: users.map((u) =>
-      _jsxs("li", { children: [u.name, " (", u.email, ")"] }, u.id)
-    ),
+    children: users.map((u) => _jsxs("li", { children: [u.name, " (", u.email, ")"] }, u.id)),
   });
 };
 

@@ -2,7 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Spinner, MessageBar, MessageBarType, Stack, Text } from '@fluentui/react';
+import {
+  Spinner,
+  MessageBar,
+  MessageBarType,
+  Stack,
+  Text,
+} from '@fluentui/react';
 import { useAuth } from '../../hooks/useAuth';
 import { AuthUser } from '../../types/auth.types';
 import {
@@ -48,7 +54,73 @@ interface UserProfileProps {
 }
 
 // -------------------------------------------------------------------
-// Main Component (merged from BASE)
+// Fluent UI Auth Profile Component
+// -------------------------------------------------------------------
+const AuthFluentProfile: React.FC = () => {
+  const [profile, setProfile] = useState<AuthProfileData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    const fetchAuthProfile = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        setError('No access token');
+        setLoading(false);
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/auth/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setProfile(toCamel(data) as AuthProfileData);
+        } else {
+          const err = await res.json();
+          setError(err.message ?? 'Failed to load auth profile');
+        }
+      } catch (e) {
+        setError('Failed to load auth profile');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAuthProfile();
+  }, []);
+
+  if (loading) {
+    return <Spinner label="Loading auth profile..." />;
+  }
+
+  if (error) {
+    return (
+      <MessageBar messageBarType={MessageBarType.error}>
+        {error}
+      </MessageBar>
+    );
+  }
+
+  return (
+    <Stack tokens={{ childrenGap: 10 }} styles={{ root: { padding: 20 } }}>
+      <Text variant="xLarge">Auth Profile</Text>
+      <Text>Subject: {profile?.sub}</Text>
+      <Text>Name: {profile?.name ?? 'N/A'}</Text>
+      <Text>Email: {profile?.email ?? 'N/A'}</Text>
+      <Text>Permissions:</Text>
+      <Stack tokens={{ childrenGap: 5 }}>
+        {profile?.permissions.map((perm) => (
+          <Text key={perm.id}>
+            {perm.key} {perm.description && `- ${perm.description}`}
+          </Text>
+        ))}
+      </Stack>
+    </Stack>
+  );
+};
+
+// -------------------------------------------------------------------
+// Main Component (merged)
 // -------------------------------------------------------------------
 export const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
   // ----- Base dropdown state (avatar, name) -----
@@ -347,17 +419,46 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
                   }
                 />
               </div>
+              <div>
+                <label>Role</label>
+                <input
+                  type="text"
+                  value={userDetail.role}
+                  onChange={(e) =>
+                    setUserDetail({ ...userDetail, role: e.target.value })
+                  }
+                />
+              </div>
               <button type="submit" disabled={loadingManagement}>
-                {loadingManagement ? 'Saving...' : 'Save Profile'}
+                {loadingManagement ? 'Saving...' : 'Save'}
               </button>
             </form>
           )}
 
           {/* Preferences Tab */}
-          {activeTab === 'preferences' && userDetail && (
+          {activeTab === 'preferences' && (
             <form onSubmit={handlePreferencesSave} data-testid="preferences-form">
-              {/* Assuming preferences fields exist on userDetail.preferences */}
-              {/* Render fields as needed */}
+              {userDetail.preferences &&
+                Object.entries(userDetail.preferences).map(
+                  ([key, value]) => (
+                    <div key={key}>
+                      <label>{key}</label>
+                      <input
+                        type="text"
+                        value={value as string}
+                        onChange={(e) =>
+                          setUserDetail({
+                            ...userDetail,
+                            preferences: {
+                              ...userDetail.preferences,
+                              [key]: e.target.value,
+                            } as UserPreferences,
+                          })
+                        }
+                      />
+                    </div>
+                  )
+                )}
               <button type="submit" disabled={loadingManagement}>
                 {loadingManagement ? 'Saving...' : 'Save Preferences'}
               </button>
@@ -369,15 +470,15 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
             <form onSubmit={handlePasswordChange} data-testid="security-form">
               <div>
                 <label>Current Password</label>
-                <input name="current_password" type="password" required />
+                <input type="password" name="current_password" required />
               </div>
               <div>
                 <label>New Password</label>
-                <input name="new_password" type="password" required />
+                <input type="password" name="new_password" required />
               </div>
               <div>
                 <label>Confirm New Password</label>
-                <input name="confirm_password" type="password" required />
+                <input type="password" name="confirm_password" required />
               </div>
               <button type="submit" disabled={loadingManagement}>
                 {loadingManagement ? 'Changing...' : 'Change Password'}
@@ -388,107 +489,30 @@ export const UserProfile: React.FC<UserProfileProps> = ({ userId }) => {
           {/* Activity Tab */}
           {activeTab === 'activity' && (
             <div data-testid="activity-tab">
-              <h3>Recent Activity</h3>
-              {/* Placeholder for activity summary */}
-              {/* You can map over userDetail.activity if such field exists */}
+              {userDetail.activity && (
+                <ul>
+                  {(
+                    userDetail.activity as unknown as ActivitySummary[]
+                  ).map((activity, idx) => (
+                    <li key={idx}>
+                      {activity.action} - {activity.timestamp}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
 
-          <button
-            onClick={handleAccountDelete}
-            className="mt-4 text-red-600 hover:underline"
-            data-testid="delete-account"
-          >
-            Delete Account
-          </button>
+          <div className="mt-4">
+            <button
+              className="text-red-600"
+              onClick={handleAccountDelete}
+            >
+              Delete Account
+            </button>
+          </div>
         </div>
       )}
-
-      {/* Placeholder Component from Integration branch */}
-      <UserProfilePlaceholder />
     </Layout>
   );
 };
-
-// -------------------------------------------------------------------
-// Fluent UI Auth Profile Component (source branch)
-// -------------------------------------------------------------------
-export const AuthFluentProfile: React.FC = () => {
-  const [profile, setProfile] = useState<AuthProfileData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const resp = await fetch('/api/v1/auth/profile', {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('access_token')}`,
-          },
-        });
-
-        if (!resp.ok) {
-          const err = await resp.json();
-          throw new Error(err.error || 'Failed to load profile');
-        }
-
-        const data = await resp.json();
-        setProfile(data);
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  if (loading) {
-    return <Spinner label="Loading profile..." />;
-  }
-
-  if (error) {
-    return (
-      <MessageBar messageBarType={MessageBarType.error}>
-        {error}
-      </MessageBar>
-    );
-  }
-
-  if (!profile) {
-    return null;
-  }
-
-  return (
-    <Stack tokens={{ childrenGap: 10 }} styles={{ root: { width: 300, padding: 20 } }}>
-      <Text variant="xLarge">User Profile</Text>
-      <Text>Name: {profile.name ?? 'N/A'}</Text>
-      <Text>Email: {profile.email ?? 'N/A'}</Text>
-      <Text variant="large">Permissions</Text>
-      {profile.permissions.length === 0 ? (
-        <Text>No permissions assigned.</Text>
-      ) : (
-        <Stack tokens={{ childrenGap: 5 }}>
-          {profile.permissions.map((perm) => (
-            <Text key={perm.id}>
-              {perm.key}
-              {perm.description ? ` - ${perm.description}` : ''}
-            </Text>
-          ))}
-        </Stack>
-      )}
-    </Stack>
-  );
-};
-
-// -------------------------------------------------------------------
-// Placeholder Component from Integration branch (THEIRS)
-// -------------------------------------------------------------------
-export const UserProfilePlaceholder: React.FC = () => {
-  // Assuming a User type exists elsewhere; using any for safety
-  const [user] = useState<any>({});
-  return <div>User Profile Placeholder</div>;
-};
-
-export default UserProfile;

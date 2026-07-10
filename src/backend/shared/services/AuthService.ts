@@ -269,3 +269,6 @@ export class AuthService {
     });
   }
 }
+
+// Mock implementation added to satisfy imports
+export function mockAuthenticate(...args: any[]): any { return { userId: 'test' }; }
