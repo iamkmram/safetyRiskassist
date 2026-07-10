@@ -103,7 +103,7 @@ export class AuthService {
   }
 
   /**
-   * Exchanges an authorization code (or resourceowner credentials) for access
+   * Exchanges an authorization code (or resource-owner credentials) for access
    * and refresh tokens.
    */
   async exchangeAuthCode(
@@ -177,7 +177,7 @@ export class AuthService {
     }
   }
 
-  // --- Static methods for mock/demo functionality (from source/base) ---
+  // --- Static methods for mock/demo functionality (from base/integration) ---
 
   /**
    * Returns the Azure AD authorization URL.

@@ -4,11 +4,16 @@
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
 
 import React from "react";
+import { jsx as _jsx } from "react/jsx-runtime";
 
 export const Placeholder = () => {
     return <div>Placeholder component for ${__dirname}</div>;
 };
 
 export const placeholder = true;
+
+export const ContentManagement = () => {
+    return _jsx("div", { children: "Content Management Placeholder" });
+};
 
 export default Placeholder;

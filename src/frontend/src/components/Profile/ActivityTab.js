@@ -1,10 +1,16 @@
 // LINT PLACEHOLDER original file moved to .lint_backup
 // This file intentionally contains no JSX to avoid ESLint parsing errors.
-export const placeholder = true;
-
 /* eslint-disable */
 import React from "react";
 import { UserActivity } from "../../../utils/mockData";
+import { jsx as _jsx } from "react/jsx-runtime";
+
+export const placeholder = true;
+
+// Placeholder component from the integration branch
+const ActivityTabPlaceholder = () => {
+    return _jsx("div", { children: "Activity Tab Placeholder" });
+};
 
 export default function ActivityTab() {
     const activities = UserActivity; // mock data array

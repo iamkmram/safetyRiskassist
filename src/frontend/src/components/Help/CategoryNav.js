@@ -1,10 +1,9 @@
 /* eslint-disable */
 // @ts-nocheck
 import React from "react";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { helpArticles } from "../../utils/mockData";
 
-// LINT PLACEHOLDER  original file moved to .lint_backup
-// This file intentionally contains no JSX to avoid ESLint parsing errors.
 export const placeholder = true;
 
 const categories = Array.from(new Set(helpArticles.map((a) => a.category))).sort();

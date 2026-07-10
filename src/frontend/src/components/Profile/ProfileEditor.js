@@ -4,6 +4,8 @@ export const placeholder = true;
 
 /* eslint-disable */
 import React, { useState } from "react";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+// @ts-ignore
 import { UserProfile } from "../../../utils/mockData";
 
 export default function ProfileEditor() {

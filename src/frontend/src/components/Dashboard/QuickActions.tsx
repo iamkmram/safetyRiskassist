@@ -1,53 +1,57 @@
 /* eslint-disable */
 import React from "react";
-import { useRouter } from "next/router";
+import { mockQuickActions } from "../../utils/mockData";
 
-export default function QuickActions() {
-  const router = useRouter();
-  router.push('/chat');
-  // Added for functionalrequirement test
+type Action = {
+  title: string;
+  description: string;
+  route: string;
+};
 
-  const actions = [
-    {
-      title: "Latest COVID-19 Restrictions",
-      description: "Get current travel requirements",
-      query: "What are the latest COVID-19 travel restrictions?",
-      route: "/chat",
-    },
-    {
-      title: "High-Risk Destinations",
-      description: "View current travel warnings",
-      query: "Show me high-risk travel destinations",
-      route: "/chat",
-    },
-    {
-      title: "Emergency Protocols",
-      description: "Access emergency procedures",
-      query: "What emergency protocols should I follow?",
-      route: "/chat",
-    },
-    {
-      title: "Weather Alerts",
-      description: "Check severe weather warnings",
-      query: "Are there any weather-related travel alerts?",
-      route: "/chat",
-    },
-  ];
+const actions: Action[] = [
+  {
+    title: "Latest COVID-19 Restrictions",
+    description: "Get current travel requirements",
+    route: "/chat",
+  },
+  {
+    title: "High-Risk Destinations",
+    description: "View current travel warnings",
+    route: "/chat",
+  },
+  {
+    title: "Emergency Protocols",
+    description: "Access emergency procedures",
+    route: "/chat",
+  },
+  {
+    title: "Weather Alerts",
+    description: "Check weather related travel alerts",
+    route: "/chat",
+  },
+];
 
-  const handleClick = (action: typeof actions[0]) => {
-    // Prefill the query via URL param (implementationspecific)
-    router.push(`${action.route}?prefill=${encodeURIComponent(action.query)}`);
-  };
+export const QuickActions: React.FC = () => (
+  <div style={{ display: "grid", gap: "10px", gridTemplateColumns: "repeat(2, 1fr)" }}>
+    {actions.map((a) => (
+      <div
+        key={a.title}
+        style={{
+          border: "1px solid #ddd",
+          padding: "8px",
+          borderRadius: "4px",
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          // Navigation stub - replace with router when integrated
+          console.log("Navigate to", a.route);
+        }}
+      >
+        <strong>{a.title}</strong>
+        <p>{a.description}</p>
+      </div>
+    ))}
+  </div>
+);
 
-  return (
-    <div className="quick-actions">
-      {actions.map((a) => (
-        <div key={a.title} className="action-card" onClick={() => handleClick(a)}>
-          <h3>{a.title}</h3>
-          <p>{a.description}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
+export default QuickActions;

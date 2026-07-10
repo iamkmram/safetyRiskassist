@@ -6,10 +6,11 @@ export const placeholder = true;
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { toSnake, toCamel } from "../../utils/helpers";
+import { jsx as _jsx } from "react/jsx-runtime";
 
 const API_BASE = "/api";
 
-const UserProfile = () => {
+export const UserProfile = () => {
     const [user, setUser] = useState(null);
     const [activeTab, setActiveTab] = useState("profile");
     const [loading, setLoading] = useState(false);
@@ -242,7 +243,7 @@ const UserProfile = () => {
                     <div>
                         <label>UI Theme</label>
                         <select
-                            value={user.preferences.ui_theme}
+                            value={user.preferences?.ui_theme || "light"}
                             onChange={(e) =>
                                 setUser({
                                     ...user,
@@ -258,14 +259,11 @@ const UserProfile = () => {
                         <label>Notifications</label>
                         <input
                             type="checkbox"
-                            checked={user.preferences.notifications_enabled}
+                            checked={user.preferences?.notifications_enabled || false}
                             onChange={(e) =>
                                 setUser({
                                     ...user,
-                                    preferences: {
-                                        ...user.preferences,
-                                        notifications_enabled: e.target.checked,
-                                    },
+                                    preferences: { ...user.preferences, notifications_enabled: e.target.checked },
                                 })
                             }
                         />
@@ -273,7 +271,7 @@ const UserProfile = () => {
                     <div>
                         <label>Language</label>
                         <select
-                            value={user.preferences.language}
+                            value={user.preferences?.language || "en"}
                             onChange={(e) =>
                                 setUser({
                                     ...user,
@@ -325,7 +323,8 @@ const UserProfile = () => {
             {/* -------------------- Activity Tab -------------------- */}
             {activeTab === "activity" && (
                 <div data-testid="activity-section">
-                    <p>Activity feed coming soon.</p>
+                    <h3>Recent Activity</h3>
+                    <p>No activity data available.</p>
                 </div>
             )}
         </div>

@@ -4,6 +4,7 @@
 // @ts-nocheck
 import React, { useState } from "react";
 import Layout from "../Common/Layout";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 
 export const placeholder = true;
 
@@ -24,11 +25,22 @@ const SupportTicket = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block mb-1">Subject</label>
-                        <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full border rounded p-2" required />
+                        <input
+                            type="text"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            className="w-full border rounded p-2"
+                            required
+                        />
                     </div>
                     <div>
                         <label className="block mb-1">Description</label>
-                        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border rounded p-2 h-32" required />
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="w-full border rounded p-2 h-32"
+                            required
+                        />
                     </div>
                     <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
                         Submit Ticket

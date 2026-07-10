@@ -5,6 +5,7 @@ export const placeholder = true;
 /* eslint-disable */
 // @ts-nocheck
 import React from "react";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useParams } from "react-router-dom";
 import Layout from "../Common/Layout";
 import { helpArticles } from "../../utils/mockData";

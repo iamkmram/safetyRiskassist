@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import Layout from "../Common/Layout";
 import CategoryNav from "./CategoryNav";
 import { helpArticles } from "../../utils/mockData";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 
 export const placeholder = true;
 

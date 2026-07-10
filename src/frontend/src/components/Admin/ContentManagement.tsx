@@ -8,4 +8,8 @@ export const Placeholder = () => {
   return <div>Placeholder component for ${__dirname}</div>;
 };
 
-export default Placeholder;
+export const ContentManagement: React.FC = () => {
+  return <div>Content Management Placeholder</div>;
+};
+
+export default ContentManagement;
