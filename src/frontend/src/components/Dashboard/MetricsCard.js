@@ -1,38 +1,7 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { mockMetrics } from "../../utils/mockData";
-
-export const MetricsCard = ({ metrics }) => {
-  const {
-    totalQueries,
-    weeklyQueries,
-    topTopics,
-    recentConversations,
-    activeAlerts,
-  } = metrics || mockMetrics;
-
-  return _jsxs(
-    "div",
-    {
-      style: {
-        border: "1px solid #ccc",
-        padding: "10px",
-        borderRadius: "4px",
-      },
-      children: [
-        _jsx("h3", { children: "Dashboard Summary" }),
-        _jsxs("p", { children: ["Total Queries: ", totalQueries] }),
-        _jsxs("p", { children: ["Weekly Queries: ", weeklyQueries] }),
-        _jsxs("p", {
-          children: [
-            "Top Topics: ",
-            topTopics && topTopics.length ? topTopics.join(", ") : "",
-          ],
-        }),
-        _jsxs("p", { children: ["Recent Conversations: ", recentConversations] }),
-        _jsxs("p", { children: ["Active Alerts: ", activeAlerts] }),
-      ],
-    }
-  );
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+const MetricsCard = ({ title, value }) => {
+    return ((0, jsx_runtime_1.jsxs)("div", { className: "p-4 bg-white rounded shadow", children: [(0, jsx_runtime_1.jsx)("h3", { className: "text-sm font-medium text-gray-500", children: title }), (0, jsx_runtime_1.jsx)("p", { className: "mt-1 text-2xl font-semibold text-gray-900", children: value })] }));
 };
-
-export default MetricsCard;
+exports.default = MetricsCard;

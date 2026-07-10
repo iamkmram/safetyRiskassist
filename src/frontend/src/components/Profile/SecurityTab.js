@@ -1,12 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
 /* eslint-disable */
-import React, { useState } from "react";
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-// LINT PLACEHOLDER  original file moved to .lint_backup
-// This file intentionally contains no JSX to avoid ESLint parsing errors.
-export const placeholder = true;
-
-export default function SecurityTab() {
-    const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
+/* eslint-disable */
+const react_1 = require("react");
+function SecurityTab() {
+    const [passwords, setPasswords] = (0, react_1.useState)({ current: "", new: "", confirm: "" });
     const handleChange = (e) => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
@@ -18,5 +17,6 @@ export default function SecurityTab() {
         console.log("Password change request:", passwords);
         alert("Password changed successfully!");
     };
-    return (_jsxs("form", { className: "space-y-4", children: [_jsxs("div", { children: [_jsx("label", { children: "Current Password" }), _jsx("input", { type: "password", name: "current", value: passwords.current, onChange: handleChange })] }), _jsxs("div", { children: [_jsx("label", { children: "New Password" }), _jsx("input", { type: "password", name: "new", value: passwords.new, onChange: handleChange })] }), _jsxs("div", { children: [_jsx("label", { children: "Confirm New Password" }), _jsx("input", { type: "password", name: "confirm", value: passwords.confirm, onChange: handleChange })] }), _jsx("button", { type: "button", onClick: handleSave, children: "Change Password" })] }));
+    return ((0, jsx_runtime_1.jsxs)("form", { className: "space-y-4", children: [(0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)("label", { children: "Current Password" }), (0, jsx_runtime_1.jsx)("input", { type: "password", name: "current", value: passwords.current, onChange: handleChange })] }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)("label", { children: "New Password" }), (0, jsx_runtime_1.jsx)("input", { type: "password", name: "new", value: passwords.new, onChange: handleChange })] }), (0, jsx_runtime_1.jsxs)("div", { children: [(0, jsx_runtime_1.jsx)("label", { children: "Confirm New Password" }), (0, jsx_runtime_1.jsx)("input", { type: "password", name: "confirm", value: passwords.confirm, onChange: handleChange })] }), (0, jsx_runtime_1.jsx)("button", { type: "button", onClick: handleSave, children: "Change Password" })] }));
 }
+exports.default = SecurityTab;

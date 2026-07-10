@@ -1,22 +1,20 @@
-"""Application Insights client stub.
-
-Provides a minimal wrapper that mimics the telemetry API used by the
-application.  In real deployments this would forward data to Azure
-Application Insights."""
 import os
+import logging
+from opencensus.ext.azure.log_exporter import AzureLogHandler
 
 class AppInsightsClient:
-    """Very small client that pretends to send telemetry."""
+    """Minimal wrapper for Azure Application Insights logging."""
 
-    def __init__(self, instrumentation_key: str):
-        self.instrumentation_key = instrumentation_key
+    def __init__(self):
+        instrumentation_key = os.getenv("APP_INSIGHTS_INSTRUMENTATION_KEY")
+        self.logger = logging.getLogger("appinsights")
+        if instrumentation_key:
+            self.logger.addHandler(
+                AzureLogHandler(
+                    connection_string=f"InstrumentationKey={instrumentation_key}"
+                )
+            )
+        self.logger.setLevel(logging.INFO)
 
-    def track_event(self, name: str, properties: dict | None = None):
-        """Noop placeholder for event tracking."""
-        # In a real implementation this would call the Azure SDK.
-        pass
-
-    def is_ready(self) -> bool:
-        """Return True if an instrumentation key is configured."""
-        return bool(self.instrumentation_key)
-
+    def log(self, message: str, level: int = logging.INFO):
+        self.logger.log(level, message)

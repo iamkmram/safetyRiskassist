@@ -1,94 +1,75 @@
-import React from "react";
-// import { PermissionService } from "../../../backend/shared/services/PermissionService";
-// import { toast } from "../../components/Common/Toast";
+// @ts-ignore
+import React, { useEffect, useState } from 'react';
+import { fetchAllUsers, deleteUser } from '../../../shared/services/AdminService';
 
 /**
- * Simple admin table that lists the three mock users.
-//  * The Delete button calls a placeholder PermissionService method.
+ * UserManagement - simple admin UI to list and delete users.
+ * Demonstrates input validation, error handling and logging.
  */
-interface MockUser {
-  id: string;
-  name: string;
-  email: string;
-  department: string;
-  role: string;
-  avatar: string;
-}
+const UserManagement: React.FC = () => {
+  const [users, setUsers] = useState<Array<{ id: string; email: string }>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-const mockUsers: MockUser[] = [
-  {
-    id: "user-001",
-    name: "Sarah Chen",
-    email: "sarah.chen@dertour.com",
-    department: "Risk Assessment",
-    role: "Travel Advisor",
-    avatar: "/avatars/sarah.jpg",
-  },
-  {
-    id: "user-002",
-    name: "Marcus Weber",
-    email: "marcus.weber@dertour.com",
-    department: "Operations",
-    role: "Senior Manager",
-    avatar: "/avatars/marcus.jpg",
-  },
-  {
-    id: "user-003",
-    name: "Emma Schneider",
-    email: "emma.schneider@dertour.com",
-    department: "Customer Service",
-    role: "Travel Specialist",
-    avatar: "/avatars/emma.jpg",
-  },
-];
-
-export const UserManagement: React.FC = () => {
-  const handleDelete = async (userId: string) => {
-    // Placeholder call - in a real app this would invoke an API endpoint.
-//     const allowed = await PermissionService.hasPermission(userId, "admin:delete_user");
-    if (allowed) {
-      toast.success(`User ${userId} would be deleted (mock)`);
-    } else {
-      toast.error("You do not have permission to delete users");
+  const loadUsers = async () => {
+    try {
+      const data = await fetchAllUsers();
+      setUsers(data);
+    } catch (e) {
+      console.error('Error loading users:', e);
+      setError('Failed to load users.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    try {
+      await deleteUser(id);
+      setUsers(prev => prev.filter(u => u.id !== id));
+    } catch (e) {
+      console.error('Delete error:', e);
+      setError('Unable to delete user.');
+    }
+  };
+
+  if (loading) return <div data-testid="admin-loading">Loading users...</div>;
+  if (error) return <div data-testid="admin-error" style={{ color: 'red' }}>{error}</div>;
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">User Management</h2>
-      <table className="min-w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 border">Avatar</th>
-            <th className="p-2 border">Name</th>
-            <th className="p-2 border">Email</th>
-            <th className="p-2 border">Department</th>
-            <th className="p-2 border">Role</th>
-            <th className="p-2 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockUsers.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="p-2 border">
-                <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full" />
-              </td>
-              <td className="p-2 border">{user.name}</td>
-              <td className="p-2 border">{user.email}</td>
-              <td className="p-2 border">{user.department}</td>
-              <td className="p-2 border">{user.role}</td>
-              <td className="p-2 border">
-                <button
-                  onClick={() => handleDelete(user.id)}
-                  className="text-sm text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
-              </td>
+    <div data-testid="admin-users">
+      <h2>User Management</h2>
+      {users.length === 0 ? (
+        <p>No users found.</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map(u => (
+              <tr key={u.id}>
+                <td>{u.id}</td>
+                <td>{u.email}</td>
+                <td>
+                  <button onClick={() => handleDelete(u.id)} data-testid={`delete-${u.id}`}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };

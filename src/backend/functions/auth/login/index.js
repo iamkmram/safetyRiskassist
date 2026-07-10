@@ -1,31 +1,29 @@
-/* eslint-disable */
-import jwt from "jsonwebtoken";
-import { getSettings } from "../../../config";
-const settings = getSettings();
-const login = async function (context, req) {
-    const { username, password } = req.body || {};
-    if (!username || !password) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const AuthService_1 = require("../../../shared/services/AuthService");
+const httpTrigger = async (context, req) => {
+    try {
+        const { username, password } = req.body || {};
+        if (!username || !password) {
+            context.res = {
+                status: 400,
+                body: { error: 'Missing credentials', details: null },
+            };
+            return;
+        }
+        const tokens = await new AuthService_1.AuthService().login(username, password);
         context.res = {
-            status: 400,
-            body: { error: "Username and password are required" },
+            status: 200,
+            body: tokens,
         };
-        return;
     }
-    // NOTE: In a real implementation you would query the DB.
-    // Here we accept any username with password "Password123!" for demo purposes.
-    const isValid = password === "Password123!";
-    if (!isValid) {
+    catch (err) {
+        const status = err.statusCode ?? 500;
+        const message = err.message ?? 'Internal server error';
         context.res = {
-            status: 401,
-            body: { error: "Invalid credentials" },
+            status,
+            body: { error: message, details: err.details || null },
         };
-        return;
     }
-    const token = jwt.sign({ sub: username, role: "user" }, settings.secret_key, { expiresIn: settings.access_token_expire_minutes * 60 });
-    context.res = {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-        body: { access_token: token, token_type: "bearer" },
-    };
 };
-export default login;
+exports.default = httpTrigger;

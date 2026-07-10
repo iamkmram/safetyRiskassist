@@ -1,26 +1,13 @@
-/* eslint-disable */
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-// import { useRouter } from "next/router";
-import { recentConversations, mockData } from "../../utils/mockData";
-// Helper to format timestamps (fallback to builtin Date)
-const formatTimestamp = (isoString) => {
-    const date = new Date(isoString);
-    return date.toLocaleString(undefined, {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
-export const RecentActivity = () => {
-    const router = useRouter();
-    // Preserve original immediate navigation behavior
-    router.push("/chat/");
-    const handleClick = (id) => {
-        router.push(`/chat/${id}`);
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const jsx_runtime_1 = require("react/jsx-runtime");
+const react_router_dom_1 = require("react-router-dom");
+const mockData_1 = require("../../utils/mockData");
+const RecentActivity = () => {
+    const navigate = (0, react_router_dom_1.useNavigate)();
+    const openConversation = (id) => {
+        navigate(`/chat/${id}`);
     };
-    const conversations = recentConversations ?? mockData?.recentConversations ?? [];
-    return (_jsx("div", { className: "space-y-3", children: conversations.map((conv) => (_jsxs("div", { className: "p-2 border rounded hover:bg-gray-50 cursor-pointer", onClick: () => handleClick(conv.id), children: [_jsxs("div", { className: "flex justify-between", children: [_jsx("span", { className: "font-medium", children: conv.title ?? "Conversation" }), _jsx("span", { className: "text-xs text-gray-500", children: formatTimestamp(conv.timestamp) })] }), _jsx("p", { className: "text-sm text-gray-600 line-clamp-2", children: conv.snippet ?? "" })] }, conv.id))) }));
+    return ((0, jsx_runtime_1.jsxs)("aside", { className: "space-y-3", children: [(0, jsx_runtime_1.jsx)("h3", { className: "font-semibold", children: "Recent Conversations" }), mockData_1.recentConversations.slice(0, 5).map((conv) => ((0, jsx_runtime_1.jsxs)("div", { className: "p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100", onClick: () => openConversation(conv.id), children: [(0, jsx_runtime_1.jsx)("p", { className: "font-medium", children: conv.title }), (0, jsx_runtime_1.jsx)("p", { className: "text-xs text-gray-500", children: conv.snippet }), (0, jsx_runtime_1.jsx)("span", { className: "text-xs text-gray-400", children: conv.title })] }, conv.id)))] }));
 };
-export default RecentActivity;
+exports.default = RecentActivity;

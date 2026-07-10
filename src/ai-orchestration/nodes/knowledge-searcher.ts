@@ -1,5 +1,5 @@
 import { KnowledgeItem } from '../../backend/shared/models/KnowledgeItem';
-import { DatabaseService } from '../../backend/shared/services/DatabaseService';
+import DatabaseService from '../../backend/shared/services/DatabaseService';
 
 /**
  * KnowledgeSearcher - performs a simple fulltext search on the knowledge_items table.

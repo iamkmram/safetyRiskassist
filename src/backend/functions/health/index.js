@@ -1,4 +1,5 @@
-/* eslint-disable */
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const healthCheck = async function (context, req) {
     context.res = {
         status: 200,
@@ -6,4 +7,4 @@ const healthCheck = async function (context, req) {
         body: { status: "ok" },
     };
 };
-export default healthCheck;
+exports.default = healthCheck;
