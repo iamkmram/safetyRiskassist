@@ -1,0 +1,8 @@
+declare module '@azure/functions';
+declare module 'jsonwebtoken';
+declare module 'typeorm';
+declare module '../../../config';
+declare module '../../../utils/auth';
+declare module '../models/UserPreferences';
+declare module '../models/UserActivity';
+declare module '../models/UserRole';
