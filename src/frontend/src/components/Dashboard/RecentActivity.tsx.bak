@@ -1,0 +1,30 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { recentConversations } from "../../utils/mockData";
+
+const RecentActivity: React.FC = () => {
+  const navigate = useNavigate();
+
+  const openConversation = (id: string) => {
+    navigate(`/chat/${id}`);
+  };
+
+  return (
+    <aside className="space-y-3">
+      <h3 className="font-semibold">Recent Conversations</h3>
+      {recentConversations.slice(0, 5).map((conv) => (
+        <div
+          key={conv.id}
+          className="p-2 bg-gray-50 rounded cursor-pointer hover:bg-gray-100"
+          onClick={() => openConversation(conv.id)}
+        >
+          <p className="font-medium">{conv.title}</p>
+          <p className="text-xs text-gray-500">{conv.snippet}</p>
+          <span className="text-xs text-gray-400">{conv.timestamp}</span>
+        </div>
+      ))}
+    </aside>
+  );
+};
+
+export default RecentActivity;

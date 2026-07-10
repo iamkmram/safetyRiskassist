@@ -1,0 +1,32 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # daily at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install npm audit dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+      - name: Run Bandit (Python security scanner)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install bandit
+          bandit -r backend -ll
