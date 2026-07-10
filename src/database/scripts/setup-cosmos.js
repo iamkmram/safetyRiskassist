@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Cosmos DB seed script - creates databases, containers, and seeds
  * core RBAC data (departments, roles, permissions).

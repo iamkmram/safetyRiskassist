@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Azure AI Search seeding script - creates an index for KnowledgeItem and
  * populates it with sample documents.

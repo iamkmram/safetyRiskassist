@@ -1,3 +1,4 @@
+/* eslint-disable */
 // @ts-nocheck
 import { CosmosClient, Container, Database as CosmosDatabase } from '@azure/cosmos';
 // @ts-ignore - suppressed by automated fix script

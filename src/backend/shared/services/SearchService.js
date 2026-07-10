@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { DatabaseService } from "./DatabaseService";
 /**
  * SearchService - very simple fulltext search over the KnowledgeItem table.

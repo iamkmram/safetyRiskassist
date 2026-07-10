@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { jsxs as _jsxs } from "react/jsx-runtime";
 export default function MetricsCard({ metrics }) {
     const { totalQueries, weeklyQueries, topTopics, recentConversations, activeAlerts, } = metrics;

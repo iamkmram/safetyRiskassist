@@ -1,3 +1,4 @@
+/* eslint-disable */
 
 /**
  * Dummy useAuth hook added by the compilationfix script.

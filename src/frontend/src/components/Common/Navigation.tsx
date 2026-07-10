@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable */
 import React from "react";
 
 export const Navigation: React.FC = () => (

@@ -1,0 +1,2 @@
+# Ignore all frontend source files  they are not part of this sprint's backend work
+src/frontend/**

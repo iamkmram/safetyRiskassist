@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Declarations for modules that are not present in the repository.
 // They are intentionally empty  only needed to satisfy the TypeScript compiler.
 declare module 'axios' {

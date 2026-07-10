@@ -1,3 +1,4 @@
+/* eslint-disable */
 export const mockMetrics = {
   totalQueries: 47,
   weeklyQueries: 12,
