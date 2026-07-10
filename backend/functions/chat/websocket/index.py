@@ -1,6 +1,11 @@
-"""WebSocket endpoint for realtime chat streaming."""
+def on_connect(ws):
+    """Handle new WebSocket connection."""
+    pass
 
-def main(req):
-    # TODO: upgrade HTTP request to WebSocket and handle streaming
-    return {"status": "OK"}
+def on_message(ws, message):
+    """Handle incoming message."""
+    pass
 
+def on_disconnect(ws):
+    """Handle WebSocket disconnection."""
+    pass

@@ -1,3 +1,4 @@
 """
-Admin function package - placeholder for future admin Azure Functions.
+Admin function package.
+Placeholder for future adminlevel Azure Functions.
 """
