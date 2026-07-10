@@ -1,77 +1,51 @@
-import { DatabaseService } from "./DatabaseService";
-import { User } from "../models/User";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { Logger } from '../utils/Logger';
 
-/**
- * AuthService - encapsulates Azure AD login URL generation,
- * token exchange, and a mock login helper for demo mode.
- */
+const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 12;
+const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-prod';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '2h';
+
 export class AuthService {
-  /**
-   * Returns the Azure AD authorization URL.
-   * In production the URL would be constructed from env vars.
-   */
-  static async getLoginUrl(): Promise<{ url: string }> {
-    // Mock URL - replace with real endpoint when integrating.
-    return { url: "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=demo-client-id&response_type=code&redirect_uri=http://localhost:3000/auth/callback" };
+  /** Hash a plaintext password */
+  static async hashPassword(password: string): Promise<string> {
+    try {
+      const hash = await bcrypt.hash(password, SALT_ROUNDS);
+      return hash;
+    } catch (err) {
+      Logger.error('Password hashing failed', { err });
+      throw err;
+    }
   }
 
-  /**
-   * Exchanges an OAuth authorization code for tokens and a user profile.
-   * This prototype returns a static payload.
-   */
-  static async exchangeCode(code: string): Promise<{
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    user: Omit<User, "permissions">;
-  }> {
-    // In a real implementation you would POST to the Azure token endpoint.
-    // Here we simply simulate success if the code equals "demo-code".
-    if (code !== "demo-code") {
-      throw new Error("Invalid authorization code");
+  /** Verify password against stored hash */
+  static async verifyPassword(password: string, hash: string): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, hash);
+    } catch (err) {
+      Logger.error('Password verification failed', { err });
+      throw err;
     }
-
-    const mockUser: User = {
-      id: "user-001",
-      name: "Sarah Chen",
-      email: "sarah.chen@dertour.com",
-      department: "Risk Assessment",
-      role: "Travel Advisor",
-      avatar: "/avatars/sarah.jpg",
-      last_login: "2026-07-08T14:30:00Z",
-      permissions: ["knowledge:read", "documents:view"],
-    };
-
-    return {
-      access_token: "mock-access-token",
-      refresh_token: "mock-refresh-token",
-      expires_in: 3600,
-      user: {
-        id: mockUser.id,
-        name: mockUser.name,
-        email: mockUser.email,
-        department: mockUser.department,
-        role: mockUser.role,
-        avatar: mockUser.avatar,
-        last_login: mockUser.last_login,
-      },
-    };
   }
 
-  /**
-   * mockLogin - returns the first mock user (Sarah Chen) for demo mode.
-   * The frontend stores the result in localStorage.
-   */
-  static async mockLogin(): Promise<User> {
-    const rows = await DatabaseService.query<User>("SELECT * FROM auth_user WHERE id = ?", [
-      "user-001",
-    ]);
-    if (rows.length === 0) {
-      throw new Error("Mock user not found");
+  /** Generate JWT for a user payload */
+  static generateToken(payload: Record<string, any>): string {
+    try {
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+      return token;
+    } catch (err) {
+      Logger.error('JWT generation failed', { err });
+      throw err;
     }
-    // permissions column is stored as JSON string
-    const user = rows[0];
-    user.permissions = JSON.parse((user as any).permissions);
-    return user;
+  }
+
+  /** Verify JWT - returns payload or throws */
+  static verifyToken(token: string): Record<string, any> {
+    try {
+      return jwt.verify(token, JWT_SECRET) as Record<string, any>;
+    } catch (err) {
+      Logger.error('JWT verification failed', { err });
+      throw err;
+    }
   }
 }

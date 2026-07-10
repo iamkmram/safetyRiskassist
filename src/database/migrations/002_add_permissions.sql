@@ -1,13 +1,10 @@
-CREATE TABLE permissions (
-    permission_id  UUID PRIMARY KEY,
-    role           TEXT NOT NULL,
-    resource       TEXT NOT NULL,
-    can_read       BOOLEAN NOT NULL DEFAULT FALSE,
-    can_write      BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- 002_add_permissions.sql
+-- Stores perdocument permission rows.
 
-INSERT INTO permissions (permission_id, role, resource, can_read, can_write)
-VALUES
-    (gen_random_uuid(), 'admin', 'help', TRUE, TRUE),
-    (gen_random_uuid(), 'user',  'help', TRUE, FALSE);
+CREATE TABLE IF NOT EXISTS permissions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL, -- e.g., viewer, editor
+    UNIQUE (document_id, user_id)
+);

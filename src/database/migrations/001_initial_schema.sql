@@ -1,89 +1,31 @@
--- Initial schema for Dertour Travel Knowledge Assistant
+-- 001_initial_schema.sql
+-- Creates the base tables required for the application.
+
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    department TEXT,
-    role TEXT,
-    avatar TEXT,
-    last_login TEXT,            -- ISO8601 timestamp stored as TEXT
-    permissions TEXT            -- JSON array stored as TEXT
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    department VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- Permissions table (reference list)
-CREATE TABLE IF NOT EXISTS permissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
+-- Knowledge items (e.g., articles, FAQs)
+CREATE TABLE IF NOT EXISTS knowledge_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- Sessions table (simple token store)
-CREATE TABLE IF NOT EXISTS sessions (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL,
-    expires_at TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+-- Conversations (for chatstyle interactions)
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
-
--- Authentication tables and mock data (SQLite dialect; JSON stored as TEXT)
-PRAGMA foreign_keys=ON;
-PRAGMA journal_mode=WAL;
-
-CREATE TABLE IF NOT EXISTS auth_user (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    department TEXT,
-    role TEXT,
-    avatar TEXT,
-    last_login TEXT,
-    permissions TEXT   -- JSON array stored as TEXT
-);
-
-INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
-('user-001',
- 'Sarah Chen',
- 'sarah.chen@dertour.com',
- 'Risk Assessment',
- 'Travel Advisor',
- '/avatars/sarah.jpg',
- '2026-07-08T14:30:00Z',
- '["knowledge:read","documents:view"]');
-
-INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
-('user-002',
- 'Marcus Weber',
- 'marcus.weber@dertour.com',
- 'Operations',
- 'Senior Manager',
- '/avatars/marcus.jpg',
- '2026-07-07T09:15:00Z',
- '["knowledge:read","documents:view","admin:access"]');
-
-INSERT INTO auth_user (id, name, email, department, role, avatar, last_login, permissions) VALUES
-('user-003',
- 'Emma Schneider',
- 'emma.schneider@dertour.com',
- 'Customer Service',
- 'Travel Specialist',
- '/avatars/emma.jpg',
- '2026-07-06T11:45:00Z',
- '["knowledge:read"]');
-
--- Help Documentation & Support Center initial schema
-CREATE TABLE help_articles (
-    article_id      UUID PRIMARY KEY,
-    title           TEXT NOT NULL,
-    content         TEXT NOT NULL,
-    category        TEXT NOT NULL,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    is_popular      BOOLEAN NOT NULL DEFAULT FALSE,
-    is_published    BOOLEAN NOT NULL DEFAULT TRUE,
-    view_count      INTEGER NOT NULL DEFAULT 0
-);
-
-CREATE INDEX idx_help_articles_category ON help_articles(category);
-CREATE INDEX idx_help_articles_popular ON help_articles(is_popular);

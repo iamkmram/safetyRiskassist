@@ -1,101 +1,66 @@
-import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { AzureFunction, Context, HttpRequest } from '@azure/functions';
-import { mockAuthenticate } from '../../../shared/services/AuthService';
+import { Request, Response } from 'express';
+import { DatabaseService } from '../../../shared/services/DatabaseService';
 import { AuthService } from '../../../shared/services/AuthService';
-import { DatabaseService } from '../../../../backend/shared/services/DatabaseService';
-
-const db = new DatabaseService();
+import { Logger } from '../../../shared/utils/Logger';
 
 /**
- * Azure Function HTTP trigger for /auth/login.
- *
- * Supports two flows:
- * 1. OAuth code exchange (`?code=...`) – uses AuthService.exchangeCode.
- * 2. Mock authentication (`?provider=...&guest=...`) – uses mockAuthenticate.
- *
- * Returns JSON responses matching the expected contracts.
+ * POST /login
+ * Expected body: { email: string, password: string }
+ * Returns: { token: string, user: { id, email, name, role, department } }
  */
-export const httpTrigger: AzureFunction = async (context: Context, req: HttpRequest): Promise<void> => {
-  const code = req.query?.code as string | undefined;
+export async function loginHandler(req: Request, res: Response): Promise<void> {
+  const { email, password } = req.body;
 
-  // Flow 1: Azure AD code exchange
-  if (code) {
-    try {
-      const tokenResponse = await AuthService.exchangeCode(code);
-      context.res = {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-        body: tokenResponse,
-      };
-    } catch (error: any) {
-      context.res = {
-        status: 400,
-        body: { error: error?.message ?? 'Invalid authorization code' },
-      };
-    }
+  // Input validation
+  if (!email || !password) {
+    Logger.error('Login request missing fields');
+    res.status(400).json({ error: 'Email and password are required.' });
     return;
   }
 
-  // Flow 2: Mock authentication
-  const provider = (req.query.provider as string) || 'microsoft';
-  const isGuest = req.query.guest === 'true';
+  const db = DatabaseService.getInstance();
 
   try {
-    const authResult = await mockAuthenticate(provider, isGuest);
-    context.res = {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: {
-        access_token: authResult.access_token,
-        refresh_token: authResult.refresh_token,
-        expires_in: authResult.expires_in,
-        user: authResult.user
-          ? {
-              id: authResult.user.id,
-              display_name: authResult.user.name,
-              email: authResult.user.email,
-              department: authResult.user.department,
-              role: authResult.user.role,
-              photo_url: authResult.user.avatar,
-              last_login: authResult.user.lastLogin,
-              permissions: authResult.user.permissions,
-            }
-          : null,
-      },
-    };
-  } catch (error) {
-    context.log.error('Login mock error:', error);
-    context.res = {
-      status: 500,
-      body: { error: 'Internal Server Error' },
-    };
-  }
-};
+    const { rows } = await db.query<{ id: string; email: string; password_hash: string; name: string; role: string; department: string }>(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
 
-export default httpTrigger;
+    if (rows.length === 0) {
+      Logger.info('Login failed - unknown email', { email });
+      res.status(401).json({ error: 'Invalid credentials.' });
+      return;
+    }
 
-/**
- * AWS Lambda handler for retrieving the Azure AD login URL.
- *
- * Returns JSON containing the URL configured via the AZURE_AD_LOGIN_URL environment variable.
- */
-export const handler = async (
-  _event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyResultV2> => {
-  try {
-    const loginUrl = process.env.AZURE_AD_LOGIN_URL ?? '';
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: loginUrl }),
-    };
-  } catch (error) {
-    console.error('Login URL fetch error:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
+    const user = rows[0];
+    const passwordMatches = await AuthService.verifyPassword(password, user.password_hash);
+
+    if (!passwordMatches) {
+      Logger.info('Login failed - wrong password', { email });
+      res.status(401).json({ error: 'Invalid credentials.' });
+      return;
+    }
+
+    const token = AuthService.generateToken({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+    });
+
+    Logger.info('User logged in successfully', { userId: user.id });
+    res.status(200).json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        department: user.department,
+      },
+    });
+  } catch (err) {
+    Logger.error('Unexpected error during login', { err });
+    res.status(500).json({ error: 'Internal server error.' });
   }
-};
+}

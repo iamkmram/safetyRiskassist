@@ -1,0 +1,61 @@
+import { DatabaseService } from './DatabaseService';
+import { PermissionRow } from '../types/database.types';
+import { Logger } from '../utils/Logger';
+
+export class PermissionService {
+  private db = DatabaseService.getInstance();
+
+  /**
+   * Checks if a given user has a specific role for a document.
+   * Returns true if permission exists, false otherwise.
+   */
+  async hasPermission(documentId: string, userId: string, requiredRole: string): Promise<boolean> {
+    const sql = \`
+      SELECT role FROM permissions
+      WHERE document_id = $1 AND user_id = $2
+    \`;
+    try {
+      const { rows } = await this.db.query<PermissionRow>(sql, [documentId, userId]);
+      if (rows.length === 0) {
+        return false;
+      }
+      const grantedRole = rows[0].role;
+      // Simple hierarchy: editor > viewer
+      if (requiredRole === 'viewer') return true;
+      return grantedRole === requiredRole;
+    } catch (err) {
+      Logger.error('Permission check failed', { documentId, userId, requiredRole, err });
+      throw err;
+    }
+  }
+
+  /** Grant a role to a user for a document (upsert). */
+  async grantPermission(documentId: string, userId: string, role: string): Promise<void> {
+    const sql = \`
+      INSERT INTO permissions (id, document_id, user_id, role)
+      VALUES (gen_random_uuid(), $1, $2, $3)
+      ON CONFLICT (document_id, user_id) DO UPDATE SET role = EXCLUDED.role;
+    \`;
+    try {
+      await this.db.query(sql, [documentId, userId, role]);
+      Logger.info('Permission granted', { documentId, userId, role });
+    } catch (err) {
+      Logger.error('Grant permission failed', { documentId, userId, role, err });
+      throw err;
+    }
+  }
+
+  /** Revoke permission */
+  async revokePermission(documentId: string, userId: string): Promise<void> {
+    const sql = \`
+      DELETE FROM permissions WHERE document_id = $1 AND user_id = $2;
+    \`;
+    try {
+      await this.db.query(sql, [documentId, userId]);
+      Logger.info('Permission revoked', { documentId, userId });
+    } catch (err) {
+      Logger.error('Revoke permission failed', { documentId, userId, err });
+      throw err;
+    }
+  }
+}

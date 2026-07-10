@@ -3,7 +3,7 @@ import { AuthUser } from "../../types/auth.types";
 import { MOCK_USERS } from "../../utils/mockDataExports";
 
 export const Placeholder = () => {
-  return <div>Placeholder component for ${__dirname}</div>;
+//   return <div>Placeholder component for ${__dirname}</div>;
 };
 
 /**

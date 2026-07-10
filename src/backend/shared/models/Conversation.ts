@@ -1,6 +1,5 @@
-export interface Conversation {
-  id: string;
-  title: string;
-  last_message_at: string; // ISO8601
-  unread: number;
+import { ConversationRow } from '../types/database.types';
+
+export interface Conversation extends ConversationRow {
+  // placeholder for future fields, e.g., participants.
 }

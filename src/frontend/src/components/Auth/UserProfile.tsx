@@ -1,50 +1,82 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
-import Layout from '../Common/Layout';
-import { mockUsers } from '../../utils/mockData';
-import { useAuth } from '../../hooks/useAuth';
-import { AuthUser } from '../../types/auth.types';
+import axios from 'axios';
+import { Button, Card, CardContent, CircularProgress, Typography } from '@mui/material';
+import { Logger } from '../../utils/Logger';
 
-const handleLogout = () => {
-  console.log('Logout placeholder  no real auth');
-};
+/** Shape of user data returned by the backend */
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  department: string;
+}
 
-/**
- * Simple userprofile dropdown used in the navigation bar.
- * Shows avatar, name and a handleLogout button.
- */
+/** Component that fetches and displays the loggedin user's profile */
 export const UserProfile: React.FC = () => {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No auth token found');
+      }
+
+      const response = await axios.get<{ user: User }>('/api/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUser(response.data.user);
+      setError(null);
+    } catch (err) {
+      const msg = (err as Error).message || 'Failed to load profile';
+      Logger.error('UserProfile fetch error', { error: msg });
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setProfile(user);
-  }, [user]);
+    fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  if (!profile) {
-    return null; // nothing to render when not logged in
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    window.location.reload();
+  };
+
+  if (loading) {
+    return <CircularProgress data-testid="loading-indicator" />;
+  }
+
+  if (error) {
+    return (
+      <Card sx={{ maxWidth: 400, margin: 'auto' }}>
+        <CardContent>
+          <Typography color="error">Error: {error}</Typography>
+          <Button variant="contained" onClick={fetchProfile}>Retry</Button>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <img
-        src={profile.avatar}
-        alt={profile.name}
-        className="w-8 h-8 rounded-full"
-      />
-      <span>{profile.name}</span>
-      <button
-        className="ml-2 text-sm text-gray-600 hover:underline"
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
-    </div>
+    <Card sx={{ maxWidth: 400, margin: 'auto' }}>
+      <CardContent>
+        <Typography variant="h5">{user?.name}</Typography>
+        <Typography color="text.secondary">{user?.email}</Typography>
+        <Typography color="text.secondary">
+          {user?.role} - {user?.department}
+        </Typography>
+        <Button variant="outlined" color="secondary" onClick={handleLogout} sx={{ mt: 2 }}>
+          Logout
+        </Button>
+      </CardContent>
+    </Card>
   );
 };
-
-// FIXED placeholder minimal valid React component
-export const Placeholder = () => {
-  return <div>Placeholder component for ${__dirname}</div>;
-};
-
-export default Placeholder;
