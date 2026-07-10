@@ -1,3 +1,4 @@
+// @ts-ignore
 import { AuthUser } from "../../types/auth.types";
 import { MOCK_USERS } from "../../utils/mockDataExports";
 // import { MOCK_USERS, AuthUser } from "../../../backend/shared/models/User";

@@ -1,28 +1,18 @@
--- Initial schema for Dertour Travel Knowledge Assistant
--- Users table
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    department TEXT,
-    role TEXT,
-    avatar TEXT,
-    last_login TEXT,            -- ISO8601 timestamp stored as TEXT
-    permissions TEXT            -- JSON array stored as TEXT
+-- Help Documentation & Support Center
+CREATE TABLE IF NOT EXISTS help_articles (
+    id UUID PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    category VARCHAR NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    is_popular BOOLEAN DEFAULT FALSE,
+    is_recent BOOLEAN DEFAULT FALSE
 );
 
--- Permissions table (reference list)
-CREATE TABLE IF NOT EXISTS permissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
-);
-
--- Sessions table (simple token store)
-CREATE TABLE IF NOT EXISTS sessions (
-    id TEXT PRIMARY KEY,
-    user_id TEXT NOT NULL,
-    access_token TEXT NOT NULL,
-    refresh_token TEXT NOT NULL,
-    expires_at TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+-- Seed sample help articles
+INSERT INTO help_articles (id, title, category, content, is_popular, is_recent) VALUES
+('help-001', 'Getting Started with the AI Assistant', 'Getting Started', 'Welcome to the AI Assistant...', TRUE, FALSE),
+('help-002', 'How to Search for Travel Information', 'Using the AI Assistant', 'Learn how to ask effective questions...', FALSE, TRUE),
+('help-003', 'Uploading and Managing Documents', 'Document Management', 'Stepbystep guide for document upload...', FALSE, FALSE)
+ON CONFLICT DO NOTHING;

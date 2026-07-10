@@ -32,3 +32,9 @@ export const MOCK_USERS: AuthUser[] = [
     permissions: [],
   },
 ];
+
+export const mockAuthenticate = async (username: string, password: string) => {
+  return { success: true, token: 'dummy-token' };
+};
+
+export const mockUsers = [];

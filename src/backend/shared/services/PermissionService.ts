@@ -18,3 +18,13 @@ export function hasPermission(userId: string, permission: string): boolean {
   }
   return user.permissions.includes(permission);
 }
+
+/**
+ * Determines whether a user role is allowed to view help content.
+ * Current implementation permits all roles; future RBAC can extend this.
+ * @param user_role Role identifier (e.g., 'admin', 'user')
+ */
+export const canViewHelp = (user_role: string): boolean => {
+  // Placeholder: allow every role for now
+  return true;
+};

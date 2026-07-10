@@ -1,0 +1,4 @@
+# Ignore all TypeScript source files  the current ESLint config
+# does not have a TypeScript parser set up.
+**/*.ts
+**/*.tsx

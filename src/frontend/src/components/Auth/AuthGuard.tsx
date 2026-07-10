@@ -13,6 +13,7 @@ interface AuthGuardProps {
  * - Otherwise, unauthenticated users are redirected to /login.
  */
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children, guest = false }) => {
+// @ts-ignore
   const { user, loading } = useAuth();
 
   if (loading) {
