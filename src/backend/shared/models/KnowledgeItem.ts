@@ -1,6 +1,14 @@
+/**
+ * TypeScript model for a Knowledge Item.
+ * Mirrors the SQL table defined in 001_initial_schema.sql.
+ */
+
 export interface KnowledgeItem {
-  id: number;
+  id: string; // UUID
   title: string;
   content: string;
-  createdAt: Date;
+  category?: string;
+  createdBy: string; // user UUID
+  createdAt: string; // ISO8601 timestamp
+  updatedAt: string; // ISO8601 timestamp
 }

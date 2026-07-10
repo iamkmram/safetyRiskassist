@@ -1,37 +1,55 @@
 import React, { useEffect, useState } from 'react';
-import { getUserProfile } from '../../services/api';
-import { User } from '../../types/api.types';
+import { getProfile } from '../../services/auth';
+import { UserProfile as UserProfileType } from '../../types/auth.types';
+import Layout from '../Common/Layout';
 
 const UserProfile: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [profile, setProfile] = useState<UserProfileType | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetch = async () => {
       try {
-        const data = await getUserProfile();
-        setUser(data);
-      } catch (e: any) {
-        setError(e.message ?? 'Failed to load profile');
-      } finally {
-        setLoading(false);
+        const data = await getProfile();
+        setProfile(data);
+      } catch (e) {
+        setError('Failed to load profile.');
+        console.error(e);
       }
     };
-    fetchProfile();
+    fetch();
   }, []);
 
-  if (loading) return <div>Loading profile...</div>;
-  if (error) return <div className="error">{error}</div>;
-  if (!user) return <div>No user data.</div>;
+  if (error) {
+    return <Layout><p className="text-red-600">{error}</p></Layout>;
+  }
+
+  if (!profile) {
+    return <Layout><p>Loading profile...</p></Layout>;
+  }
 
   return (
-    <div className="user-profile">
-      <h2>{user.username}'s Profile</h2>
-      <p><strong>Email:</strong> {user.email}</p>
-      <p><strong>Department:</strong> {user.department?.name ?? 'N/A'}</p>
-      <p><strong>Roles:</strong> {user.roles?.map(r => r.name).join(', ') ?? 'None'}</p>
-    </div>
+    <Layout>
+      <div className="max-w-md mx-auto p-4 bg-white rounded shadow">
+        <h2 className="text-2xl font-semibold mb-4">My Profile</h2>
+        <dl>
+          <dt className="font-medium">Full Name</dt>
+          <dd className="mb-2">{profile.fullName}</dd>
+
+          <dt className="font-medium">Email</dt>
+          <dd className="mb-2">{profile.email}</dd>
+
+          <dt className="font-medium">Department</dt>
+          <dd className="mb-2">{profile.departmentId}</dd>
+
+          <dt className="font-medium">Roles</dt>
+          <dd className="mb-2">{profile.roles?.join(', ')}</dd>
+
+          <dt className="font-medium">Permissions</dt>
+          <dd>{profile.permissions?.join(', ')}</dd>
+        </dl>
+      </div>
+    </Layout>
   );
 };
 
