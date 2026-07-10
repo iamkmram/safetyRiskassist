@@ -3,16 +3,14 @@ Oops! Something went wrong! :(
 
 ESLint: 10.6.0
 
-Error: Cannot find module '@typescript-eslint/eslint-plugin'
-Require stack:
-- /workspace/eslint.config.js
-    at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)
-    at Module._load (node:internal/modules/cjs/loader:1038:27)
-    at Module.require (node:internal/modules/cjs/loader:1289:19)
-    at require (node:internal/modules/helpers:182:18)
-    at Object.<anonymous> (/workspace/eslint.config.js:18:29)
-    at Module._compile (node:internal/modules/cjs/loader:1521:14)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-    at Module.load (node:internal/modules/cjs/loader:1266:32)
-    at Module._load (node:internal/modules/cjs/loader:1091:12)
-    at cjsLoader (node:internal/modules/esm/translators:298:15)
+TypeError: Key "languageOptions": Key "parser": Expected object with parse() or parseForESLint() method.
+    at new Config (/workspace/node_modules/eslint/lib/config/config.js:506:10)
+    at [finalizeConfig] (/workspace/node_modules/eslint/lib/config/flat-config-array.js:212:10)
+    at FlatConfigArray.getConfigWithStatus (/workspace/node_modules/@eslint/config-array/dist/cjs/index.cjs:1411:55)
+    at FlatConfigArray.getConfig (/workspace/node_modules/@eslint/config-array/dist/cjs/index.cjs:1429:15)
+    at entryFilter (/workspace/node_modules/eslint/lib/eslint/eslint-helpers.js:325:27)
+    at async NodeHfs.<anonymous> (file:///workspace/node_modules/@humanfs/core/src/hfs.js:574:24)
+    at async NodeHfs.<anonymous> (file:///workspace/node_modules/@humanfs/core/src/hfs.js:604:6)
+    at async NodeHfs.<anonymous> (file:///workspace/node_modules/@humanfs/core/src/hfs.js:604:6)
+    at async NodeHfs.<anonymous> (file:///workspace/node_modules/@humanfs/core/src/hfs.js:604:6)
+    at async NodeHfs.walk (file:///workspace/node_modules/@humanfs/core/src/hfs.js:614:3)
